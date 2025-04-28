@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include "Hash.h"
 
 class LinearProbing {
 typedef std::pair<std::string, int> word_pair;
@@ -18,7 +19,7 @@ public:
             if (occupancy*2 >= size)
                 resize();
 
-            int index = hash(word);
+            int index = hash(word, size);
             while (arr[index] != empty && arr[index].first != word) {
                 index = (index + 1) % size;
             }
@@ -32,20 +33,12 @@ public:
     }
 
 private:
-    int size = 64, occupancy = 0;
+    int size = 128, occupancy = 0;
     word_pair* arr = nullptr;
     word_pair empty = {"", 0};
 
-    int hash(const std::string& word) {
-        int n = 0;
-
-        // for (char c : word) 
-        //     n = n*31 + (tolower(c) - 'a');
-
-        for (int i = 0; i < word.size(); i++) n += (word[i] - 'a')*(i+1);
-        return n % size;
-    }    
     void resize() {
+        std::cout << "Resizing.\n";
         int oldSize = size;
         size *= 2;
         word_pair* newArr = new word_pair[size];
@@ -54,10 +47,11 @@ private:
         //rehash
         for (int i = 0; i < oldSize; i++) {
             if (arr[i] != empty) {
-                int index = hash(arr[i].first);
+                int index = hash(arr[i].first, size);
                 while (newArr[index] != empty) {
                     index = (index + 1) % size;
                 }
+                
                 newArr[index] = arr[i];
             }
         }

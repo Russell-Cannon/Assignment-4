@@ -50,13 +50,6 @@ void clean(std::string& _word)
     }
 }
 
-int hash(const std::vector<std::list<int>>& hash_table, const std::string& word) 
-{
-    int n = 0;
-    for (int i = 0; i < word.size(); i++) n += (word[i] - 'a')*(i+1);
-    return n % hash_table.size();
-}
-
 /*
     auto tot_start = std::chrono::high_resolution_clock::now();
     auto tot_stop = std::chrono::high_resolution_clock::now();
