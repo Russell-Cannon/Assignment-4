@@ -1,6 +1,5 @@
 # Notes
 Libraries - Everything but STL algorithms
- - 
 Works I-VI use open hashing (separate chaining)
 Works VII-XII use linear probing
 Read once, string-by-string
