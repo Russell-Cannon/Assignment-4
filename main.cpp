@@ -10,7 +10,8 @@
 void clean(std::string& _word);
 int hash(const std::vector<std::list<int>>& hash_table, const std::string& word);
 
-int main() {
+int main() 
+{
     // Works I through VI should be stored using open hashing (separate chaining)
     // std::ifstream I_VI("I_VI.txt");
     // std::string word;
@@ -39,7 +40,8 @@ int main() {
     return 0;
 }
 
-void clean(std::string& _word) {
+void clean(std::string& _word) 
+{
     // It’s important to note that capitalization should not matter (i.e., “Watson” and “watson” should be counted as the same word)
     for (int i = 0; i < _word.size(); i++) {
         _word[i] = tolower(_word[i]);
@@ -48,8 +50,16 @@ void clean(std::string& _word) {
     }
 }
 
-int hash(const std::vector<std::list<int>>& hash_table, const std::string& word) {
+int hash(const std::vector<std::list<int>>& hash_table, const std::string& word) 
+{
     int n = 0;
     for (int i = 0; i < word.size(); i++) n += (word[i] - 'a')*(i+1);
     return n % hash_table.size();
 }
+
+/*
+    auto tot_start = std::chrono::high_resolution_clock::now();
+    auto tot_stop = std::chrono::high_resolution_clock::now();
+    auto tot_time = std::chrono::duration_cast<std::chrono::nanoseconds>(tot_stop - tot_start);
+    std::cout << "Final time: " << tot_time.count() << " seconds!" << std::endl;
+*/
