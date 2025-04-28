@@ -96,7 +96,7 @@ void search(string pat, string txt, int q)
 int main()
 {
     string txt = "How much wood could a wood chuck chuck if a wood chuck could chuck wood";
-    string pat = "wood";
+    string pat = "Wood";
 
     // we mod to avoid overflowing of value but we should
     // take as big q as possible to avoid the collison
