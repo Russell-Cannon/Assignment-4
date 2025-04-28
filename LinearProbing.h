@@ -2,8 +2,9 @@
 #include <iostream>
 #include <string>
 #include "Hash.h"
+#include "HashTable.h"
 
-class LinearProbing {
+class LinearProbing : HashTable {
 typedef std::pair<std::string, int> word_pair;
 public:
     LinearProbing(std::istream& in) {
