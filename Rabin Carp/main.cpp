@@ -1,6 +1,9 @@
 /* Following program is a C++ implementation of Rabin Karp
 Algorithm given in the CLRS book */
-#include <bits/stdc++.h>
+
+#include <iostream>
+#include <string>
+#include "../Functions.h"
 using namespace std;
 
 // Search the pat string in the txt string
@@ -25,6 +28,7 @@ void search(string pat, string txt, int q)
     // window of text
     for (i = 0; i < M; i++)
     {
+
         cout << "-------------------" << endl;
         cout << "I: " << i+1 << endl;
         p = (d * p + pat[i]) % q;
@@ -96,8 +100,10 @@ void search(string pat, string txt, int q)
 int main()
 {
     string txt = "How much wood could a wood chuck chuck if a wood chuck could chuck wood";
-    string pat = "Wood";
+    string pat = "WOoD";
 
+    clean(txt);
+    clean(pat);
     // we mod to avoid overflowing of value but we should
     // take as big q as possible to avoid the collison
     int q = INT_MAX;
