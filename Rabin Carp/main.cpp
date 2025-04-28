@@ -85,8 +85,6 @@ void search(string pat, string txt, int q)
                 t = (t + q);
             }
         }
-
-
     }
     if(amount == 0)
     {
