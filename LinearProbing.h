@@ -1,14 +1,26 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include <queue>
 #include "Functions.h"
 
+class WordPair {
+public:
+    std::string first = "";
+    int second = 0;
+    bool empty = true;
+
+    WordPair(std::string _first, int _second) : first(_first), second(_second), empty(true) {}
+    WordPair() {}
+};
+
+struct Less     { bool operator()(const WordPair& lhs, const WordPair& rhs) {return lhs.second > rhs.second;} };
+struct Greater  { bool operator()(const WordPair& lhs, const WordPair& rhs) {return lhs.second < rhs.second;} };
+
 class LinearProbing {
-typedef std::pair<std::string, int> word_pair;
 public:
     LinearProbing(std::istream& in) {
-        arr = new word_pair [size];
-        for (int i = 0; i < size; i++) arr[i] = empty; //Unoccupied
+        arr = new WordPair [size];
 
         Read(in);
     }
@@ -16,39 +28,83 @@ public:
     void Read(std::istream& in) {
         std::string word;
         while (in >> word) {
-            if (occupancy*2 >= size)
-                resize();
+            std::vector<std::string> words;
+            clean_and_split(word, words);
 
-            int index = hash(word, size);
-            while (arr[index] != empty && arr[index].first != word) {
-                index = (index + 1) % size;
+            for (std::string w : words) { //Usually just one, sometimes two
+                if (occupancy*2 >= size)
+                    resize();
+
+                int index = hash(w, size);
+                while (!arr[index].empty && arr[index].first != w) {
+                    index = (index + 1) % size;
+                }
+                if (arr[index].empty) {
+                    arr[index].first = w;
+                    arr[index].empty = false;
+                    occupancy++; //had to declare new space
+                }
+                arr[index].second++;
+                if (debug) std::cout << w << " (" << arr[index].second << ")\n";
             }
-            if (arr[index] == empty) {
-                arr[index].first = word;
-                occupancy++; //had to declare new space
-            }
-            arr[index].second++;
-            std::cout << word << " (" << arr[index].second << ")\n";
+
         }
     }
 
+    void Output(std::ostream& out) {
+        for (int i = 0; i < size; i++) {
+            if (!arr[i].empty) {
+                out << arr[i].first << " (" << arr[i].second << ")\n";
+            }
+        }
+    }
+
+    WordPair* SortAscending(int K) {
+        std::priority_queue<WordPair, std::vector<WordPair>, Greater> heap;
+        for (int i = 0; i < size; i++) {
+            if (!arr[i].empty)
+                heap.push(arr[i]);
+        }
+
+        WordPair* output = new WordPair [K];
+        int heapSize = heap.size();
+        for (int i = 0; i < K && i < heapSize; i++) {
+            output[i] = heap.top();
+            heap.pop();
+        }
+        return output;
+    }
+    WordPair* SortDescending(int K) {
+        std::priority_queue<WordPair, std::vector<WordPair>, Less> heap;
+        for (int i = 0; i < size; i++) {
+            if (!arr[i].empty)
+                heap.push(arr[i]);
+        }
+
+        WordPair* output = new WordPair [K];
+        int heapSize = heap.size();
+        for (int i = 0; i < K && i < heapSize; i++) {
+            output[i] = heap.top();
+            heap.pop();
+        }
+        return output;
+    }
+
 private:
-    int size = 128, occupancy = 0;
-    word_pair* arr = nullptr;
-    word_pair empty = {"", 0};
+    int size = 64, occupancy = 0;
+    WordPair* arr = nullptr;
 
     void resize() {
-        std::cout << "Resizing.\n";
+        if (debug) std::cout << "Resizing.\n";
         int oldSize = size;
         size *= 2;
-        word_pair* newArr = new word_pair[size];
-        for (int i = 0; i < size; i++) newArr[i] = empty;
+        WordPair* newArr = new WordPair[size];
 
         //rehash
         for (int i = 0; i < oldSize; i++) {
-            if (arr[i] != empty) {
+            if (!arr[i].empty) {
                 int index = hash(arr[i].first, size);
-                while (newArr[index] != empty) {
+                while (!newArr[index].empty) {
                     index = (index + 1) % size;
                 }
                 

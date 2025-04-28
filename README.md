@@ -20,10 +20,13 @@ All files need .h headers
 - [x] Is the due date supposed to be 4/25? 
 - [ ] Do we combine works I-VI and VII-XII for the most occurring?
 - [ ] Do we and how do we sort the word occurrences? Is there a specific algorithm in mind?
+- [ ] Can we use Functional ?
+- [ ] How do we count sentences? 
 
 
 # To Do
  - [ ] Implement Open Hashing
+ - [x] Implement linear probing
  - [ ] Cleaning strings
  - [ ] Change the hash function?
  - [ ] Detect chapter headings and split input for open hashing and linear probing
@@ -33,6 +36,9 @@ All files need .h headers
    - Ignore '!'
    - Count '?'
    - Count '.'
+ - [ ] Paper
+   - [ ] Test with multiple hash functions
+   - [ ] 
 
 # Division
 Russell - Linear probing

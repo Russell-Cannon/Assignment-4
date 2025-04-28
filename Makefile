@@ -1,5 +1,5 @@
 # compiler name
-CXX = clang++ 
+CXX = g++ 
 
 # C++ compiler flags
 # -c : just do preprocess; compile and assemble into object files
