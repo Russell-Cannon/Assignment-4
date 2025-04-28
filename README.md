@@ -27,8 +27,8 @@ All files need .h headers
 # To Do
  - [ ] Implement Open Hashing
  - [x] Implement linear probing
- - [ ] Cleaning strings
- - [ ] Change the hash function?
+ - [x] Cleaning strings
+ - [x] Change the hash function?
  - [ ] Detect chapter headings and split input for open hashing and linear probing
  - [ ] Pattern matching
  - [ ] Report times
@@ -38,9 +38,9 @@ All files need .h headers
    - Count '.'
  - [ ] Paper
    - [ ] Test with multiple hash functions
-   - [ ] 
+   - [ ] Test with different occupancy ratios
 
 # Division
-Russell - Linear probing
+Russell - Cleaning strings
 Patrick - Open Hashing
 Ian - Rabin-Karp
