@@ -1,3 +1,4 @@
+#include <array>
 #include <cctype>
 #include <fstream>
 #include <iostream>
@@ -26,6 +27,7 @@ int main()
 
     // Works VII to XII should be stored using Linear Probing.
     std::ifstream VII_XII("VII_XII.txt");
+    std::array<int, 64> linear_probing;
     
     // Once the data is processed, the program should display and record to a file a list of word occurrences from highest to lowest vice versa of the 80 most and least repeated words (and their count)
 
