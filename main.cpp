@@ -1,3 +1,4 @@
+#include "LinearProbing.h"
 #include <array>
 #include <cctype>
 #include <fstream>
@@ -11,21 +12,21 @@ int hash(const std::vector<std::list<int>>& hash_table, const std::string& word)
 
 int main() {
     // Works I through VI should be stored using open hashing (separate chaining)
-    std::ifstream I_VI("I_VI.txt");
-    std::string word;
-    std::vector<std::list<int>> open_hash;
+    // std::ifstream I_VI("I_VI.txt");
+    // std::string word;
+    // std::vector<std::list<int>> open_hash;
 
     //Get open_hash working
 
-    while (I_VI >> word) {
-        clean(word);
+    // while (I_VI >> word) {
+    //     clean(word);
 
-        open_hash[hash(open_hash, word)].front() = 1;
-    }
+    //     open_hash[hash(open_hash, word)].front() = 1;
+    // }
 
     // Works VII to XII should be stored using Linear Probing.
     std::ifstream VII_XII("VII_XII.txt");
-    std::array<int, 64> linear_probing;
+    LinearProbing linear(VII_XII);
     
     // Once the data is processed, the program should display and record to a file a list of word occurrences from highest to lowest vice versa of the 80 most and least repeated words (and their count)
 
