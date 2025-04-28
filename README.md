@@ -22,3 +22,19 @@ All files need .h headers
 - [ ] Do we and how do we sort the word occurrences? Is there a specific algorithm in mind?
 
 
+# To Do
+ - [ ] Implement Open Hashing
+ - [ ] Cleaning strings
+ - [ ] Change the hash function?
+ - [ ] Detect chapter headings and split input for open hashing and linear probing
+ - [ ] Pattern matching
+ - [ ] Report times
+ - [ ] Count sentences
+   - Ignore '!'
+   - Count '?'
+   - Count '.'
+
+# Division
+Russell - Linear probing
+Patrick - Open Hashing
+Ian - Rabin-Karp
