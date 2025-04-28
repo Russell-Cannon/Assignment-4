@@ -1,10 +1,9 @@
 #pragma once
 #include <iostream>
 #include <string>
-#include "Hash.h"
-#include "HashTable.h"
+#include "Functions.h"
 
-class LinearProbing : HashTable {
+class LinearProbing {
 typedef std::pair<std::string, int> word_pair;
 public:
     LinearProbing(std::istream& in) {
