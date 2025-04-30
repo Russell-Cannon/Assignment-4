@@ -264,7 +264,7 @@ inline void OpenHashTable::clean_word(std::string& word) const {
     word = word.substr(start, end - start);
 }
 
-// splits & cleans punctuation, numbers, or any non-letter character. Perserves hyphens in middle of words
+// splits & cleans punctuation, numbers, or any non-letter character. Preserves hyphens in middle of words
 inline void OpenHashTable::split_and_clean(const std::string& word, std::vector<std::string>& vec) {
     std::string current;
     for (size_t i = 0; i < word.length(); ++i) {

@@ -16,23 +16,15 @@ Need to be able to display the number of sentences in the text
 Report the time it takes for each task
 All files need .h headers
 
-# Questions
-- [x] Is the due date supposed to be 4/25? 
-- [ ] Do we combine works I-VI and VII-XII for the most occurring?
-- [ ] Do we and how do we sort the word occurrences? Is there a specific algorithm in mind?
-- [ ] Can we use Functional ?
-- [ ] How do we count sentences? 
-
-
 # To Do
- - [ ] Implement Open Hashing
+ - [x] Implement Open Hashing
  - [x] Implement linear probing
  - [x] Cleaning strings
  - [x] Change the hash function?
- - [ ] Detect chapter headings and split input for open hashing and linear probing
+ - [x] Detect chapter headings and split input for open hashing and linear probing
  - [ ] Pattern matching
  - [ ] Report times
- - [ ] Count sentences
+ - [x] Count sentences
    - Ignore '!'
    - Count '?'
    - Count '.'
@@ -41,6 +33,6 @@ All files need .h headers
    - [ ] Test with different occupancy ratios
 
 # Division
-Russell - Cleaning strings
-Patrick - Open Hashing
+Russell - Combining open and linear hashing to project folder
+Patrick - Count sentances
 Ian - Rabin-Karp

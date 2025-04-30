@@ -1,12 +1,6 @@
 #include "LinearProbing.h"
-#include <array>
-#include <cctype>
 #include <fstream>
 #include <iostream>
-#include <vector>
-#include <list>
-#include <string>
-#include "Functions.h"
 
 int main() 
 {
