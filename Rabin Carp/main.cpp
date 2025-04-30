@@ -3,8 +3,11 @@ Algorithm given in the CLRS book */
 
 #include <iostream>
 #include <string>
-#include "../Functions.h"
+#include "../Open Hashing/Functions.h"
 using namespace std;
+
+void search(string, string, int);
+bool Las_vegas(string, string, int);
 
 // Search the pat string in the txt string
 void search(string pat, string txt, int q)
@@ -47,12 +50,13 @@ void search(string pat, string txt, int q)
         // check for characters one by one
         if (p == t)
         {
+
             /* Check for characters one by one */
             for (j = 0; j < M; j++)
             {
                 if (txt[i + j] != pat[j])
                 {
-                    cout << "Found a pattern" << endl;
+                    cout << "pattern broken" << endl;
                     break;
                 }
             }
@@ -62,18 +66,26 @@ void search(string pat, string txt, int q)
 
             if (j == M)
             {
-                amount++;
-                cout << "Pattern found at index: " << i << endl;
-                cout << txt << endl;
-                for(int o = 0;  o < i; o++)
+                if (Las_vegas(pat, txt, i) == true)
                 {
-                    cout << " ";
+                    cout << "Pattern accpeted by Las Vegas check" << endl;
+                    amount++;
+                    cout << "Pattern found at index: " << i << endl;
+                    cout << txt << endl;
+                    for(int o = 0;  o < i; o++)
+                    {
+                        cout << " ";
+                    }
+                    for(int v = 0; v < pat.size(); v++)
+                    {
+                        cout << "^";
+                    }
+                    cout << endl;
                 }
-                for(int v = 0; v < pat.size(); v++)
+                else
                 {
-                    cout << "^";
+                    cout << "Pattern denied by Las Vegas check" << endl;
                 }
-                cout << endl;
             }
         }
 
@@ -96,11 +108,28 @@ void search(string pat, string txt, int q)
     }
 }
 
+bool Las_vegas(string pat, string txt, int i)
+{
+    bool veg;
+    for(int j = 0; j < pat.size(); j++)
+    {    
+        if(pat[j] == txt[i + j])
+        {
+            veg = true;
+        }
+    }
+    if(veg == true)
+    {
+        return true;
+    }
+    return false;
+}
+
 /* Driver code */
 int main()
 {
     string txt = "How much wood could a wood chuck chuck if a wood chuck could chuck wood";
-    string pat = "WOoD";
+    string pat = "chuck";
 
     clean(txt);
     clean(pat);
@@ -111,5 +140,6 @@ int main()
     search(pat, txt, q);
     return 0;
 }
+
 
 // This is code is contributed by rathbhupendra

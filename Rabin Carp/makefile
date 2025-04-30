@@ -7,7 +7,7 @@ CXX = clang++
 # -Wall : turns on most, but not  all, compiler warnings
 # -std=c++17 : uses c++17 standard
 # put all the required flags separated by space
-CXXFLAGS = -c -g -Wall -std=c++17
+CXXFLAGS = -c -g -std=c++17
 
 # the build target executable file; .exe is not required
 PROGRAM = main.out
