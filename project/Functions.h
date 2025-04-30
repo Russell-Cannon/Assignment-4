@@ -6,6 +6,14 @@
 
 #define debug 0
 
+static int sentence_counter = 0;
+
+inline void checkForSentence(const std::string &raw_word) {
+    if (raw_word.back() == '.' || raw_word.back() == '!' || raw_word.back() == '?') {
+        ++sentence_counter;
+    }
+}
+
 static int hash(const std::string& word, int size) {
     int n = 0; // Hash value
     int h = 1;
@@ -67,6 +75,7 @@ static void clean(std::string& word)
 }
 
 static void clean_and_split(std::string word, std::vector<std::string>& arr) {
+    checkForSentence(word); // check for punctuation before cleaning word
     clean(word);
     int size = word.length();
     for (int i = 0; i < size; i++) {
