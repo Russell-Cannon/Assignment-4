@@ -34,5 +34,5 @@ All files need .h headers
 
 # Division
 Russell - Combining open and linear hashing to project folder
-Patrick - Count sentances
+Patrick - Count sentences
 Ian - Rabin-Karp

@@ -2,40 +2,52 @@
 #include <iostream>
 #include <string>
 #include <queue>
+#include <vector>
 #include "Functions.h"
 #include "WordPair.h"
 
 class LinearProbing {
 public:
+    LinearProbing() {
+        arr = new WordPair [size];
+    }
     LinearProbing(std::istream& in) {
         arr = new WordPair [size];
-
         Read(in);
+    }
+    LinearProbing(std::vector<WordPair>& in) {
+        arr = new WordPair [size];
+        Read(in);
+    }
+    ~LinearProbing() {
+        delete [] arr;
     }
 
     void Read(std::istream& in) {
         std::string word;
         while (in >> word) {
-            std::vector<std::string> words;
-            clean_and_split(word, words);
-
-            for (std::string w : words) { //Usually just one, sometimes two
-                if (occupancy*2 >= size)
-                    resize();
-
-                int index = hash(w, size);
-                while (!arr[index].empty && arr[index].word != w) {
-                    index = (index + 1) % size;
-                }
-                if (arr[index].empty) {
-                    arr[index].word = w;
-                    arr[index].empty = false;
-                    occupancy++; //had to declare new space
-                }
-                arr[index].count++;
-                if (debug) std::cout << w << " (" << arr[index].count << ")\n";
+            for (std::string w : clean_and_split(word)) { //Usually just one, sometimes two
+                addElement(WordPair(w, 1));
             }
+        }
+    }
 
+    void ReadUntil(std::istream& in, std::string end) {
+        clean(end);
+        std::string word;
+        while (in >> word) {
+            for (std::string w : clean_and_split(word)) { //Usually just one, sometimes two
+                if (w == end)
+                    return;
+
+                addElement(WordPair(w, 1));
+            }
+        }
+    }
+
+    void Read(std::vector<WordPair>& in) {
+        for (WordPair pair : in) {
+            addElement(pair);
         }
     }
 
@@ -47,14 +59,14 @@ public:
         }
     }
 
-    WordPair* SortAscending(int K) {
+    std::vector<WordPair> SortAscending(int K) {
         std::priority_queue<WordPair, std::vector<WordPair>, Greater> heap;
         for (int i = 0; i < size; i++) {
             if (!arr[i].empty)
                 heap.push(arr[i]);
         }
 
-        WordPair* output = new WordPair [K];
+        std::vector<WordPair> output(K);
         int heapSize = heap.size();
         for (int i = 0; i < K && i < heapSize; i++) {
             output[i] = heap.top();
@@ -62,14 +74,14 @@ public:
         }
         return output;
     }
-    WordPair* SortDescending(int K) {
+    std::vector<WordPair> SortDescending(int K) {
         std::priority_queue<WordPair, std::vector<WordPair>, Less> heap;
         for (int i = 0; i < size; i++) {
             if (!arr[i].empty)
                 heap.push(arr[i]);
         }
 
-        WordPair* output = new WordPair [K];
+        std::vector<WordPair> output(K);
         int heapSize = heap.size();
         for (int i = 0; i < K && i < heapSize; i++) {
             output[i] = heap.top();
@@ -81,6 +93,23 @@ public:
 private:
     int size = 64, occupancy = 0;
     WordPair* arr = nullptr;
+
+    void addElement(WordPair pair) {
+        if (occupancy*2 >= size)
+            resize();
+
+        int index = hash(pair.word, size);
+        while (!arr[index].empty && arr[index].word != pair.word) {
+            index = (index + 1) % size;
+        }
+        if (arr[index].empty) { //Does not already exist
+            arr[index].word = pair.word;
+            arr[index].empty = false;
+            occupancy++; //had to declare new space
+        }
+        arr[index].count += pair.count; //Does exist
+        if (debug) std::cout << pair.word << " (" << arr[index].count << ")\n";
+    }
 
     void resize() {
         if (debug) std::cout << "Resizing.\n";

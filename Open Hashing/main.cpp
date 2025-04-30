@@ -11,7 +11,7 @@ int main() {
     }
 
     // Create open hash table
-    OpenHashTable openHash(16691);
+    OpenHashing openHash(16691);
 
     // Fill the table with Works I–VI
     openHash.readUntilVII(in);

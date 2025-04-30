@@ -5,16 +5,11 @@
 #include <iostream>
 #include <fstream>
 #include "Functions.h" 
-
-// Struct that keeps track of word and word count
-struct WordCount {
-    std::string word;
-    int count;
-};
+#include "WordPair.h"
 
 class OpenHashing {
 private:
-    std::vector<std::list<WordCount>> open_hash_table;
+    std::vector<std::list<WordPair>> open_hash_table;
     int size;
 
 public:
@@ -25,30 +20,26 @@ public:
     int getWordCount(const std::string& raw_word) const; // get how many times a word appears in the table
     
     // these functions return a vector of the data in hash table
-    std::vector<std::list<WordCount>> getOpenHashTable() const; // deep copy open hash table, keeps chains
-    std::vector<WordCount> getAllWordsUnsorted() const; //  unsorted words, unchains data
-    std::vector<WordCount> getAllWordsSortedDescending() const; // desecending by word count, unchains data
-    std::vector<WordCount> getAllWordsSortedAscending() const; // ascending by word count, unchains data
-    void fillAllWords(std::vector<WordCount>& outWords) const; // helper function that fills word-count pairs from hash table, unchains data
+    std::vector<std::list<WordPair>> getOpenHashTable() const; // deep copy open hash table, keeps chains
+    std::vector<WordPair> getAllWordsUnsorted() const; //  unsorted words, unchains data
+    std::vector<WordPair> getAllWordsSortedDescending() const; // desecending by word count, unchains data
+    std::vector<WordPair> getAllWordsSortedAscending() const; // ascending by word count, unchains data
+    void fillAllWords(std::vector<WordPair>& outWords) const; // helper function that fills word-count pairs from hash table, unchains data
     
     // display the most or least frequent n words
     void displayMostFrequent(int n) const;
     void displayLeastFrequent(int n) const;
 
     // gets the most or least frequent n words
-    std::vector<WordCount> getMostFrequent(int n) const;
-    std::vector<WordCount> getLeastFrequent(int n) const;
+    std::vector<WordPair> getMostFrequent(int n) const;
+    std::vector<WordPair> getLeastFrequent(int n) const;
 
     // Sorting function & helpers  |  sort by word counts
-    void insertionSort(std::vector<WordCount>& vec, int low, int high, bool descending) const;
-    int partition(std::vector<WordCount>& vec, int low, int high, bool descending) const;
-    void quickSortHybrid(std::vector<WordCount>& vec, int low, int high, bool descending) const;
-    void sortWordCountsDescending(std::vector<WordCount>& vec) const; // Sort from most to least frequent
-    void sortWordCountsAscending(std::vector<WordCount>& vec) const; // Sort from least to most frequent
-
-    // helper functions for inserting words | some modifications to functions from Functions.h
-    inline void clean_word(std::string& word) const;
-    inline void split_and_clean(const std::string& word, std::vector<std::string>& vec);
+    void insertionSort(std::vector<WordPair>& vec, int low, int high, bool descending) const;
+    int partition(std::vector<WordPair>& vec, int low, int high, bool descending) const;
+    void quickSortHybrid(std::vector<WordPair>& vec, int low, int high, bool descending) const;
+    void sortWordPairsDescending(std::vector<WordPair>& vec) const; // Sort from most to least frequent
+    void sortWordPairsAscending(std::vector<WordPair>& vec) const; // Sort from least to most frequent
 };
 
 // constructor
@@ -61,9 +52,9 @@ void OpenHashing::readUntilVII(std::ifstream& inFile) {
     std::string word;
     while (inFile >> word) {
         std::vector<std::string> words;
-        split_and_clean(word, words);
+        clean_and_split(word, words);
         for (std::string w : words) {
-            clean_word(w);
+            clean(w);
             if (w == "vii") {
                 return;
             }
@@ -76,7 +67,7 @@ void OpenHashing::readUntilVII(std::ifstream& inFile) {
 // Insert a word (or increment if already exists) in hash table
 void OpenHashing::insert(const std::string& raw_word) {
     std::string word = raw_word;
-    clean_word(word);
+    clean(word);
     if (word.empty()) {
         return;
     }
@@ -93,7 +84,7 @@ void OpenHashing::insert(const std::string& raw_word) {
 // Gets how many time a word appears (word count)
 int OpenHashing::getWordCount(const std::string& raw_word) const {
     std::string word = raw_word;
-    clean_word(word);
+    clean(word);
     int index = hash(word, size);
     for (const auto& wc : open_hash_table[index]) {
         if (wc.word == word) {
@@ -104,36 +95,36 @@ int OpenHashing::getWordCount(const std::string& raw_word) const {
 }
 
 // Returns a deep copy of internal hash table
-std::vector<std::list<WordCount>> OpenHashing::getOpenHashTable() const {
-    std::vector<std::list<WordCount>> copy = open_hash_table;
+std::vector<std::list<WordPair>> OpenHashing::getOpenHashTable() const {
+    std::vector<std::list<WordPair>> copy = open_hash_table;
     return copy;
 }
 
 // Returns all word-count pairs unsorted, unchains words
-std::vector<WordCount> OpenHashing::getAllWordsUnsorted() const {
-    std::vector<WordCount> words;
+std::vector<WordPair> OpenHashing::getAllWordsUnsorted() const {
+    std::vector<WordPair> words;
     fillAllWords(words);
     return words;
 }
 
 // Returns all word-count pairs sorted in descending order, unchains words
-std::vector<WordCount> OpenHashing::getAllWordsSortedDescending() const {
-    std::vector<WordCount> words;
+std::vector<WordPair> OpenHashing::getAllWordsSortedDescending() const {
+    std::vector<WordPair> words;
     fillAllWords(words);
-    sortWordCountsDescending(words);
+    sortWordPairsDescending(words);
     return words;
 }
 
 // Returns all word-count pairs sorted in ascending order, unchains words
-std::vector<WordCount> OpenHashing::getAllWordsSortedAscending() const {
-    std::vector<WordCount> words;
+std::vector<WordPair> OpenHashing::getAllWordsSortedAscending() const {
+    std::vector<WordPair> words;
     fillAllWords(words);
-    sortWordCountsAscending(words);
+    sortWordPairsAscending(words);
     return words;
 }
 
 // Helper function that fills parameter word-count pairs, unchains words
-void OpenHashing::fillAllWords(std::vector<WordCount>& outWords) const {
+void OpenHashing::fillAllWords(std::vector<WordPair>& outWords) const {
     for (const auto& chain : open_hash_table) {
         for (const auto& wc : chain) {
             outWords.push_back(wc);
@@ -143,9 +134,9 @@ void OpenHashing::fillAllWords(std::vector<WordCount>& outWords) const {
 
 // prints n most frequent words
 void OpenHashing::displayMostFrequent(int n) const {
-    std::vector<WordCount> words;
+    std::vector<WordPair> words;
     fillAllWords(words);
-    sortWordCountsDescending(words);
+    sortWordPairsDescending(words);
     for (int i = 0; i < n && i < (int)words.size(); ++i) {
         std::cout << words[i].word << ": " << words[i].count << '\n';
     }
@@ -153,19 +144,19 @@ void OpenHashing::displayMostFrequent(int n) const {
 
 // prints n least frequent words
 void OpenHashing::displayLeastFrequent(int n) const {
-    std::vector<WordCount> words;
+    std::vector<WordPair> words;
     fillAllWords(words);
-    sortWordCountsAscending(words);
+    sortWordPairsAscending(words);
     for (int i = 0; i < n && i < (int)words.size(); ++i) {
         std::cout << words[i].word << ": " << words[i].count << '\n';
     }
 }
 
 // gets n most frequent words
-std::vector<WordCount> OpenHashing::getMostFrequent(int n) const {
-    std::vector<WordCount> words;
+std::vector<WordPair> OpenHashing::getMostFrequent(int n) const {
+    std::vector<WordPair> words;
     fillAllWords(words);
-    sortWordCountsDescending(words);
+    sortWordPairsDescending(words);
     if ((int)words.size() > n) {
         words.resize(n);
     }
@@ -173,10 +164,10 @@ std::vector<WordCount> OpenHashing::getMostFrequent(int n) const {
 }
 
 // gets n least frequent words
-std::vector<WordCount> OpenHashing::getLeastFrequent(int n) const {
-    std::vector<WordCount> words;
+std::vector<WordPair> OpenHashing::getLeastFrequent(int n) const {
+    std::vector<WordPair> words;
     fillAllWords(words);
-    sortWordCountsAscending(words);
+    sortWordPairsAscending(words);
     if ((int)words.size() > n) {
         words.resize(n);
     }
@@ -185,9 +176,9 @@ std::vector<WordCount> OpenHashing::getLeastFrequent(int n) const {
 }
 
 // insertion sort for quickSortHybrid
-void OpenHashing::insertionSort(std::vector<WordCount>& vec, int low, int high, bool descending) const {
+void OpenHashing::insertionSort(std::vector<WordPair>& vec, int low, int high, bool descending) const {
     for (int i = low + 1; i <= high; ++i) {
-        WordCount key = vec[i];
+        WordPair key = vec[i];
         int j = i - 1;
         while (j >= low && ((descending ? vec[j].count < key.count : vec[j].count > key.count) || (vec[j].count == key.count && vec[j].word > key.word))) {
             vec[j + 1] = vec[j];
@@ -198,9 +189,9 @@ void OpenHashing::insertionSort(std::vector<WordCount>& vec, int low, int high, 
 }
 
 // Quicksort partition using middle element as pivot
-int OpenHashing::partition(std::vector<WordCount>& vec, int low, int high, bool descending) const {
+int OpenHashing::partition(std::vector<WordPair>& vec, int low, int high, bool descending) const {
     int mid = low + (high - low) / 2;
-    WordCount pivot = vec[mid];
+    WordPair pivot = vec[mid];
     std::swap(vec[mid], vec[high]);
     int i = low;
     for (int j = low; j < high; ++j) {
@@ -214,7 +205,7 @@ int OpenHashing::partition(std::vector<WordCount>& vec, int low, int high, bool 
 }
 
 // Quicksort that switches to insertion sort for small sub vectors of size 20 or less
-void OpenHashing::quickSortHybrid(std::vector<WordCount>& vec, int low, int high, bool descending) const {
+void OpenHashing::quickSortHybrid(std::vector<WordPair>& vec, int low, int high, bool descending) const {
     const int INSERTION_THRESHOLD = 20;
 
     if (low < high) {
@@ -229,69 +220,15 @@ void OpenHashing::quickSortHybrid(std::vector<WordCount>& vec, int low, int high
 }
 
 // Sort from most to least frequent
-void OpenHashing::sortWordCountsDescending(std::vector<WordCount>& vec) const {
+void OpenHashing::sortWordPairsDescending(std::vector<WordPair>& vec) const {
     if (!vec.empty()) {
         quickSortHybrid(vec, 0, static_cast<int>(vec.size() - 1), true);
     }
 }
 
 // Sort from least to most frequent
-void OpenHashing::sortWordCountsAscending(std::vector<WordCount>& vec) const {
+void OpenHashing::sortWordPairsAscending(std::vector<WordPair>& vec) const {
     if (!vec.empty()) {
         quickSortHybrid(vec, 0, static_cast<int>(vec.size() - 1), false);
-    }
-}
-
-// convert to lowercase, also removes leading & trailing non-letter characters
-inline void OpenHashing::clean_word(std::string& word) const {
-    // convert to lowercase
-    for (size_t i = 0; i < word.length(); ++i) {
-        if (isalpha(word[i])) {
-            word[i] = std::tolower(static_cast<unsigned char>(word[i]));
-        }
-    }
-
-    // find index of first alphabetic character
-    size_t start = 0;
-    while (start < word.length() && !std::isalpha(word[start])) {
-        ++start;
-    }
-    // find the index of last character
-    size_t end = word.length();
-    while (end > start && !std::isalpha(word[end - 1])) {
-        --end;
-    }
-    word = word.substr(start, end - start);
-}
-
-// splits & cleans punctuation, numbers, or any non-letter character. Preserves hyphens in middle of words
-inline void OpenHashing::split_and_clean(const std::string& word, std::vector<std::string>& vec) {
-    std::string current;
-    for (size_t i = 0; i < word.length(); ++i) {
-        char c = tolower(word[i]);
-        if (isalpha(c)) {
-            current += c; // build one letter at a time
-        } 
-        else if (c == '-') {
-            // Keep a hyphen only if it's between two letters
-            if (i > 0 && i < word.length() - 1 && isalpha(word[i - 1]) && isalpha(word[i + 1])) {
-                current += '-';
-            } 
-            else if (!current.empty()) {
-                vec.push_back(current); 
-                current.clear();
-            }
-        } 
-        else {
-            // Any other punctuation/seperators, disregard them and push word
-            if (!current.empty()) {
-                vec.push_back(current);
-                current.clear();
-            }
-        }
-    }
-    // push last word if loop ended while a word exists in current
-    if (!current.empty()) {
-        vec.push_back(current);
     }
 }
