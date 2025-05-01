@@ -14,38 +14,47 @@ int main() {
     }
     
     // Works I through VI should be stored using open hashing (separate chaining)
-    OpenHashing open(16691);
-    open.readUntilVII(in);
+    OpenHashing open;
+    open.readUntil(in, "VII");
 
     // Works VII to XII should be stored using Linear Probing.
     LinearProbing linear;
-    linear.ReadUntil(in, "IX"); //read up until we hit Chapter 9.
+    linear.readUntil(in, "IX"); //read up until we hit Chapter 9.
 
     //As the program starts processing work IX “The Adventure of the Engineer’s Thumb”, it should prompt the user for search key
     //display the position of each key’s occurrence in the text
     //Rabin-Karp pattern matching algorithm and Horner’s rule for the rolling hash should be utilized for this purpose
 
-    linear.Read(in); //read until end
+    linear.read(in); //read until end
     
     // Once the data is processed, the program should display and record to a file a list of word occurrences from highest to lowest vice versa of the 80 most and least repeated words (and their count)
     const int N = 80;
-    std::vector<WordPair> highest = combineVectors(linear.SortAscending(N), open.getMostFrequent(N));
-    std::vector<WordPair> lowest = combineVectors(linear.SortDescending(N), open.getLeastFrequent(N));
+    std::vector<WordPair> highest = combineVectors(linear.getMostFrequent(N), open.getMostFrequent(N));
+    std::vector<WordPair> lowest = combineVectors(linear.getLeastFrequent(N), open.getLeastFrequent(N));
     
     std::ofstream mostOut("frequent.log");
     std::ofstream leastOut("rare.log");
 
     //Create another hash table to combine the two
     LinearProbing highestCombined(highest);
-    highest = highestCombined.SortAscending(N);
+    highest = highestCombined.getMostFrequent(N);
     for (int i = 0; i < N; i++) mostOut << (i+1) << ". " << highest[i] << '\n';
 
     LinearProbing lowestCombined(lowest);
-    lowest = lowestCombined.SortDescending(N);
+    lowest = lowestCombined.getLeastFrequent(N);
     for (int i = 0; i < N; i++) leastOut << (i+1) << ". " << lowest[i] << '\n';
 
-    std::cout << "Total sentences: " << sentence_counter << "\n";
+    std::ofstream stats("stats.log");
+    stats << "Total sentences: " << sentence_counter << '\n';
+    stats << "Most common word: '" << highest[0].word << "'\n";
+    stats << "Least common word: '" << lowest[0].word << "'\n";
 
+    stats << "\nOpen Chaining:\n";
+    open.printChainStats(stats);
+    stats << "\nLinear Probing:\n";
+    linear.printStats(stats);
+
+    stats.close();
     mostOut.close();
     leastOut.close();
 

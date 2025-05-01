@@ -17,18 +17,24 @@ inline void checkForSentence(const std::string &raw_word) {
     } 
 }
 
-static int hash(const std::string& word, int size) {
-    int n = 0; // Hash value
-    int h = 1;
-    int d = 256; // d is the number of characters in the input alphabet 
-    // The value of h would be "pow(d, M-1)%q"
-    for (int i = 0; i < (int)word.size() - 1; i++)
-        h = (h * d) % size;
+static int charToIndex(const char c) {
+    //-, a, b, ..., z, 0, 1, ... 9
+    if (c == '-') return 1;
+    if (c == '\'') return 2;
+    if (std::isalpha(c)) return c - 'a' + 3;
+    if (std::isdigit(c)) return c - '0' + 26 + 4;
+    return 0;
+}
 
-    for (int i = 0; i < (int)word.size(); i++)
-        n = (d * n + word[i]) % size;
-    
-    return abs(n);
+static int hash(const std::string& word, int size) {
+    int p = 31, m = 1e9 + 7, hashValue = 0, pPow = 1;
+
+    for (char c : word) {
+        hashValue = (hashValue + charToIndex(c) * pPow) % m;
+        pPow = (pPow * p) % m;
+    }
+
+    return hashValue % size;
 }
 
 static void clean(std::string& word) 

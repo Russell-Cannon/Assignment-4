@@ -13,17 +13,17 @@ public:
     }
     LinearProbing(std::istream& in) {
         arr = new WordPair [size];
-        Read(in);
+        read(in);
     }
     LinearProbing(std::vector<WordPair>& in) {
         arr = new WordPair [size];
-        Read(in);
+        read(in);
     }
     ~LinearProbing() {
         delete [] arr;
     }
 
-    void Read(std::istream& in) {
+    void read(std::istream& in) {
         std::string word;
         while (in >> word) {
             for (std::string w : clean_and_split(word)) { //Usually just one, sometimes two
@@ -32,7 +32,7 @@ public:
         }
     }
 
-    void ReadUntil(std::istream& in, std::string end) {
+    void readUntil(std::istream& in, std::string end) {
         clean(end);
         std::string word;
         while (in >> word) {
@@ -45,21 +45,49 @@ public:
         }
     }
 
-    void Read(std::vector<WordPair>& in) {
+    void read(std::vector<WordPair>& in) {
         for (WordPair pair : in) {
             addElement(pair);
         }
     }
 
-    void Output(std::ostream& out) {
+    void output(std::ostream& out) {
         for (int i = 0; i < size; i++) {
             if (!arr[i].empty) {
                 out << arr[i].word << " (" << arr[i].count << ")\n";
             }
         }
     }
+    
+    void printStats(std::ostream& out) {
+        out << "Size of hashtable: " << size << '\n';
+        out << "Number of words stored: " << occupancy << '\n';
+        out << "Load size (lambda): " << (double)occupancy/size << '\n';
+    
+        int maxClusterSize = 0, minClusterSize = 255, sumClusterSize = 0, numClusters = 0;
+        bool inCluster = false;
+        int currentClusterSize = 0;
+        for (int i = 0; i < size; i++) {
+            if (arr[i].empty && inCluster) { //just left cluster
+                sumClusterSize += currentClusterSize;
+                numClusters++;
+                if (maxClusterSize < currentClusterSize) maxClusterSize = currentClusterSize;
+                if (minClusterSize > currentClusterSize) minClusterSize = currentClusterSize;
 
-    std::vector<WordPair> SortAscending(int K) {
+                currentClusterSize = 0;
+                inCluster = false;
+            }
+            inCluster = !arr[i].empty;
+            if (inCluster)
+                currentClusterSize++;
+        }
+
+        out << "Largest cluster: " << maxClusterSize << '\n';
+        out << "Smallest cluster: " << minClusterSize << '\n';
+        out << "Average cluster: " << (double)sumClusterSize/numClusters << '\n';
+    }
+
+    std::vector<WordPair> getMostFrequent(int K) {
         std::priority_queue<WordPair, std::vector<WordPair>, Greater> heap;
         for (int i = 0; i < size; i++) {
             if (!arr[i].empty)
@@ -74,7 +102,7 @@ public:
         }
         return output;
     }
-    std::vector<WordPair> SortDescending(int K) {
+    std::vector<WordPair> getLeastFrequent(int K) {
         std::priority_queue<WordPair, std::vector<WordPair>, Less> heap;
         for (int i = 0; i < size; i++) {
             if (!arr[i].empty)
@@ -113,16 +141,14 @@ private:
 
     void resize() {
         if (debug) std::cout << "Resizing.\n";
-        int oldSize = size;
-        size *= 2;
-        WordPair* newArr = new WordPair[size];
-
+        WordPair* newArr = new WordPair[size*2];
+        
         //rehash
-        for (int i = 0; i < oldSize; i++) {
+        for (int i = 0; i < size; i++) {
             if (!arr[i].empty) {
-                int index = hash(arr[i].word, size);
+                int index = hash(arr[i].word, size*2);
                 while (!newArr[index].empty) {
-                    index = (index + 1) % size;
+                    index = (index + 1) % (size*2);
                 }
                 
                 newArr[index] = arr[i];
@@ -131,5 +157,6 @@ private:
         
         delete [] arr;
         arr = newArr;
+        size *= 2;
     }
 };

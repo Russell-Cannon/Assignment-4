@@ -9,26 +9,25 @@
 
 class OpenHashing {
 private:
-    std::vector<std::list<WordPair>> open_hash_table;
-    int size;
+    std::list<WordPair>* open_hash_table;
+    int size, occupancy;
 
 public:
-    OpenHashing(int s); // create hash table with specified size
+    OpenHashing(); // create hash table
+    ~OpenHashing(); // delete hash table
 
-    void readUntilVII(std::ifstream& in); // reads until the cleaned word "vii" (marks the end of Book VI)
+    void readUntil(std::ifstream& in, std::string delimiter); // reads until the cleaned word "vii" (marks the end of Book VI)
     void insert(const std::string& raw_word); // clean and insert word into hash table
+    void resize(); //Double the size of the hash_table.
     int getWordCount(const std::string& raw_word) const; // get how many times a word appears in the table
-    
+    void printChainStats(std::ostream& out) const; // Prints the average, max, and min chainlength in the table
+
     // these functions return a vector of the data in hash table
     std::vector<std::list<WordPair>> getOpenHashTable() const; // deep copy open hash table, keeps chains
     std::vector<WordPair> getAllWordsUnsorted() const; //  unsorted words, unchains data
     std::vector<WordPair> getAllWordsSortedDescending() const; // desecending by word count, unchains data
     std::vector<WordPair> getAllWordsSortedAscending() const; // ascending by word count, unchains data
     void fillAllWords(std::vector<WordPair>& outWords) const; // helper function that fills word-count pairs from hash table, unchains data
-    
-    // display the most or least frequent n words
-    void displayMostFrequent(int n) const;
-    void displayLeastFrequent(int n) const;
 
     // gets the most or least frequent n words
     std::vector<WordPair> getMostFrequent(int n) const;
@@ -43,19 +42,24 @@ public:
 };
 
 // constructor
-OpenHashing::OpenHashing(int s) : size(s) {
-    open_hash_table.resize(size);
+OpenHashing::OpenHashing() : size(64), occupancy(0) {
+    open_hash_table = new std::list<WordPair> [size];
+}
+
+OpenHashing::~OpenHashing() { // delete hash table
+    delete [] open_hash_table;
 }
 
 // Reads and inserts words until "vii"
-void OpenHashing::readUntilVII(std::ifstream& inFile) {
+void OpenHashing::readUntil(std::ifstream& inFile, std::string delimiter) {
+    clean(delimiter);
     std::string word;
     while (inFile >> word) {
         std::vector<std::string> words;
         clean_and_split(word, words);
         for (std::string w : words) {
             clean(w);
-            if (w == "vii") {
+            if (w == delimiter) {
                 return;
             }
 
@@ -66,6 +70,9 @@ void OpenHashing::readUntilVII(std::ifstream& inFile) {
 
 // Insert a word (or increment if already exists) in hash table
 void OpenHashing::insert(const std::string& raw_word) {
+    if (10*occupancy/size > 9)
+        resize(); //Y. Daniel Yiang recommends a lambda under 0.9 for separate chaining
+
     std::string word = raw_word;
     clean(word);
     if (word.empty()) {
@@ -78,7 +85,23 @@ void OpenHashing::insert(const std::string& raw_word) {
             return; 
         }
     }
-    open_hash_table[index].push_back({word, 1}); // chain word to list
+    open_hash_table[index].push_front({word, 1}); // chain word to list
+    occupancy++; //if we made a new element in the list
+}
+
+//Double the size of the hash_table.
+void OpenHashing::resize() {
+    std::list<WordPair>* new_table = new std::list<WordPair>[size*2];
+
+    for (int i = 0; i < size; i++) {
+        for (WordPair pair : open_hash_table[i]) {
+            new_table[hash(pair.word, size*2)].push_front(pair);
+        }
+    }
+
+    delete [] open_hash_table;
+    open_hash_table = new_table;
+    size *= 2;
 }
 
 // Gets how many time a word appears (word count)
@@ -94,17 +117,21 @@ int OpenHashing::getWordCount(const std::string& raw_word) const {
     return 0;
 }
 
-// Returns a deep copy of internal hash table
-std::vector<std::list<WordPair>> OpenHashing::getOpenHashTable() const {
-    std::vector<std::list<WordPair>> copy = open_hash_table;
-    return copy;
-}
+ // Returns the average chainlength in the table
+void OpenHashing::printChainStats(std::ostream& out) const {
+    int max = open_hash_table[0].size(), min = max;
+    
+    for (int i = 0; i < size; i++) {
+        int n = open_hash_table[i].size();
+        if (max < n) max = n;
+        if (min > n) min = n;
+    }
 
-// Returns all word-count pairs unsorted, unchains words
-std::vector<WordPair> OpenHashing::getAllWordsUnsorted() const {
-    std::vector<WordPair> words;
-    fillAllWords(words);
-    return words;
+    out << "Number of lists: " << size << '\n';
+    out << "Number of words stored: " << occupancy << '\n';
+    out << "Load Size (Lambda): " << (double)occupancy/size << "\n";
+    out << "Maximum Chain Length: " << max << "\n";
+    out << "Minimum Chain Length: " << min << "\n";
 }
 
 // Returns all word-count pairs sorted in descending order, unchains words
@@ -125,32 +152,13 @@ std::vector<WordPair> OpenHashing::getAllWordsSortedAscending() const {
 
 // Helper function that fills parameter word-count pairs, unchains words
 void OpenHashing::fillAllWords(std::vector<WordPair>& outWords) const {
-    for (const auto& chain : open_hash_table) {
-        for (const auto& wc : chain) {
+    for (int i = 0; i < size; i++) {
+        for (const auto& wc : open_hash_table[i]) {
             outWords.push_back(wc);
         }
     }
 }
 
-// prints n most frequent words
-void OpenHashing::displayMostFrequent(int n) const {
-    std::vector<WordPair> words;
-    fillAllWords(words);
-    sortWordPairsDescending(words);
-    for (int i = 0; i < n && i < (int)words.size(); ++i) {
-        std::cout << words[i].word << ": " << words[i].count << '\n';
-    }
-}
-
-// prints n least frequent words
-void OpenHashing::displayLeastFrequent(int n) const {
-    std::vector<WordPair> words;
-    fillAllWords(words);
-    sortWordPairsAscending(words);
-    for (int i = 0; i < n && i < (int)words.size(); ++i) {
-        std::cout << words[i].word << ": " << words[i].count << '\n';
-    }
-}
 
 // gets n most frequent words
 std::vector<WordPair> OpenHashing::getMostFrequent(int n) const {
@@ -195,7 +203,7 @@ int OpenHashing::partition(std::vector<WordPair>& vec, int low, int high, bool d
     std::swap(vec[mid], vec[high]);
     int i = low;
     for (int j = low; j < high; ++j) {
-        if ((descending ? vec[j].count > pivot.count : vec[j].count < pivot.count) || (vec[j].count == pivot.count && vec[j].word < pivot.word)) {
+        if ((descending ? vec[j] > pivot : vec[j] < pivot) || (vec[j] == pivot && vec[j].word < pivot.word)) {
             std::swap(vec[i], vec[j]);
             ++i;
         }
