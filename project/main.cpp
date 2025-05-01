@@ -44,7 +44,6 @@ int main() {
     lowest = lowestCombined.SortDescending(N);
     for (int i = 0; i < N; i++) leastOut << (i+1) << ". " << lowest[i] << '\n';
 
-    // testing sentence counter. Outputs: 5132, comes close to what majority of sentence counters online find
     std::cout << "Total sentences: " << sentence_counter << "\n";
 
     mostOut.close();

@@ -7,11 +7,14 @@
 #define debug 0
 
 static int sentence_counter = 0;
-
 inline void checkForSentence(const std::string &raw_word) {
-    if (raw_word.back() == '.' || raw_word.back() == '!' || raw_word.back() == '?') {
+    int back = raw_word.size() - 1;
+    while (raw_word[back] == '\'' || raw_word[back] == '"')
+        back--;
+
+    if (raw_word[back] == '.' || raw_word[back] == '!' || raw_word[back] == '?') {
         ++sentence_counter;
-    }
+    } 
 }
 
 static int hash(const std::string& word, int size) {

@@ -33,6 +33,6 @@ All files need .h headers
    - [ ] Test with different occupancy ratios
 
 # Division
-Russell - Combining open and linear hashing to project folder
+Russell - Making open chaining not need to know N before hand. Also experimenting with load size?
 Patrick - Count sentences
 Ian - Rabin-Karp
