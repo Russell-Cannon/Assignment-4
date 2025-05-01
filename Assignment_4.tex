@@ -113,17 +113,15 @@ static int charToIndex(const char c) {
 }
 
 static int hash(const std::string& word, int size) {
-    const int p = 31; // A small prime base
-    const int m = 1e9 + 9; // A large prime modulus
-    long long hash_value = 0;
-    long long p_pow = 1;
+    int p = 31;
+    long int m = 1e9 + 7, hashValue = 0, pPow = 1;
 
     for (char c : word) {
-        hash_value = (hash_value + charToIndex(c) * p_pow) % m;
-        p_pow = (p_pow * p) % m;
+        hashValue = (hashValue + charToIndex(c) * pPow) % m;
+        pPow = (pPow * p) % m;
     }
 
-    return hash_value % size;
+    return hashValue % size;
 }
 
 yield:

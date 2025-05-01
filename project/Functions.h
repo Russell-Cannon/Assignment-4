@@ -27,7 +27,8 @@ static int charToIndex(const char c) {
 }
 
 static int hash(const std::string& word, int size) {
-    int p = 31, m = 1e9 + 7, hashValue = 0, pPow = 1;
+    int p = 31;
+    long int m = 1e9 + 7, hashValue = 0, pPow = 1;
 
     for (char c : word) {
         hashValue = (hashValue + charToIndex(c) * pPow) % m;
