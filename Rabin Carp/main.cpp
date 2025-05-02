@@ -1,16 +1,33 @@
 /* Following program is a C++ implementation of Rabin Karp
 Algorithm given in the CLRS book */
-
+#include <chrono>
 #include <iostream>
 #include <string>
 #include "../Open Hashing/Functions.h"
 using namespace std;
 
-void search(string, string, int);
+int search(string, string, int);
 bool Las_vegas(string, string, int);
+int Wordplace(int, string);
+
+int main()
+{
+    string txt = "how much wood could a wood chuck chuck if a wood chuck could chuck wood";
+    string pat = "o";
+    int q = INT_MAX;
+    int word_count;
+
+    clean(txt);
+    clean(pat);
+
+    word_count = search(pat, txt, q);
+    cout << "There are a total of " << word_count << " in the txt that match" << endl;
+
+    return 0;
+}
 
 // Search the pat string in the txt string
-void search(string pat, string txt, int q)
+int search(string pat, string txt, int q)
 {
     int M = pat.size();
     int N = txt.size();
@@ -20,34 +37,29 @@ void search(string pat, string txt, int q)
     int h = 1;
     int d = 256; // d is the number of characters in the input alphabet
     int amount = 0;
-    // The value of h would be "pow(d, M-1)%q"
+    int array;
+    int Word_placement[100] = {};
 
+    /* start the clock for run time of both Rabin Carp and Las Vegas check */
+    auto tot_start = std::chrono::high_resolution_clock::now();
+
+    // The value of h would be "pow(d, M-1)%q"
     for (i = 0; i < M - 1; i++)
     {
         h = (h * d) % q;
     }
 
-    // Calculate the hash value of pattern and first
-    // window of text
+    /* Calculate hash values of pattern and first window of text */
     for (i = 0; i < M; i++)
     {
-
-        cout << "-------------------" << endl;
-        cout << "I: " << i+1 << endl;
         p = (d * p + pat[i]) % q;
-        cout << "P: " << p << endl;
         t = (d * t + txt[i]) % q;
-        cout << "T: " << p << endl;
     }
-        cout << "-------------------" << endl;
 
-    // Slide the pattern over text one by one
+    /* Slide the pattern over text one by one */
     for (i = 0; i <= N - M; i++)
     {
-        
-        // Check the hash values of current window of text
-        // and pattern. If the hash values match then only
-        // check for characters one by one
+
         if (p == t)
         {
 
@@ -56,21 +68,21 @@ void search(string pat, string txt, int q)
             {
                 if (txt[i + j] != pat[j])
                 {
-                    cout << "pattern broken" << endl;
+                    cerr << "ERR: pattern broken" << endl;
                     break;
                 }
             }
-
-            // if p == t and pat[0...M-1] = txt[i, i+1,
-            // ...i+M-1]
 
             if (j == M)
             {
                 if (Las_vegas(pat, txt, i) == true)
                 {
-                    cout << "Pattern accpeted by Las Vegas check" << endl;
                     amount++;
-                    cout << "Pattern found at index: " << i << endl;
+                    Word_placement[array] = Wordplace(i, txt);
+                    array++;
+                    auto tot_stop = std::chrono::high_resolution_clock::now();
+                    auto tot_time = std::chrono::duration_cast<std::chrono::nanoseconds>(tot_stop - tot_start);
+                    
                     cout << txt << endl;
                     for(int o = 0;  o < i; o++)
                     {
@@ -81,10 +93,17 @@ void search(string pat, string txt, int q)
                         cout << "^";
                     }
                     cout << endl;
+                    std::cout << "Rabin Carp time: " << tot_time.count() << " nanoseconds!" << std::endl;
+                    cout << endl;
+                    
                 }
                 else
                 {
+                    auto tot_stop = std::chrono::high_resolution_clock::now();
+                    auto tot_time = std::chrono::duration_cast<std::chrono::nanoseconds>(tot_stop - tot_start);
                     cout << "Pattern denied by Las Vegas check" << endl;
+
+                    std::cout << "Rabin Carp denial time: " << tot_time.count() << " nanoseconds!" << std::endl;
                 }
             }
         }
@@ -94,18 +113,30 @@ void search(string pat, string txt, int q)
         if (i < N - M)
         {
             t = (d * (t - txt[i] * h) + txt[i + M]) % q;
-            // We might get negative value of t, converting
-            // it to positive
             if (t < 0)
             {
                 t = (t + q);
             }
         }
+    
     }
     if(amount == 0)
     {
         cout << "No patterns found" << endl;
+        auto tot_stop = std::chrono::high_resolution_clock::now();
+        auto tot_time = std::chrono::duration_cast<std::chrono::nanoseconds>(tot_stop - tot_start);
+        std::cout << "Time elapsed: " << tot_time.count() << " nanoseconds!" << std::endl;
     }
+    if(amount != 0)
+    {
+        cout << "Words were found in places: ";
+        for(i = 0; i < amount; i++)
+        {
+            cout << Word_placement[i] << ", ";
+        }
+        cout << endl;
+    }
+    return amount;
 }
 
 bool Las_vegas(string pat, string txt, int i)
@@ -125,21 +156,23 @@ bool Las_vegas(string pat, string txt, int i)
     return false;
 }
 
-/* Driver code */
-int main()
+int Wordplace(int index, string txt)
 {
-    string txt = "How much wood could a wood chuck chuck if a wood chuck could chuck wood";
-    string pat = "chuck";
-
-    clean(txt);
-    clean(pat);
-    // we mod to avoid overflowing of value but we should
-    // take as big q as possible to avoid the collison
-    int q = INT_MAX;
-    // Function Call
-    search(pat, txt, q);
-    return 0;
+    int spacecount = 1; // to account for the 0th word
+    for(int i = 0; i < index; i++)
+    {
+        if(txt[i] == ' ')
+        {
+            spacecount++;
+        }
+    }
+    return spacecount;
 }
 
-
 // This is code is contributed by rathbhupendra
+/*
+    auto tot_start = std::chrono::high_resolution_clock::now();
+    auto tot_stop = std::chrono::high_resolution_clock::now();
+    auto tot_time = std::chrono::duration_cast<std::chrono::nanoseconds>(tot_stop - tot_start);
+    std::cout << "Final time: " << tot_time.count() << " seconds!" << std::endl;
+*/
