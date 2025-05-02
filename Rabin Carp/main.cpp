@@ -9,7 +9,31 @@ using namespace std;
 int search(string, string, int);
 bool Las_vegas(string, string, int);
 int Wordplace(int, string);
+/* 
+For when we add all these togeather, replace the name main with this:
 
+int Rabin(int row)
+{
+    string txt = "how much wood could a wood chuck chuck if a wood chuck could chuck wood";
+    string pat = "wood";
+    int q = INT_MAX;
+    int word_count;
+
+    clean(txt);
+    clean(pat);
+
+    word_count = search(pat, txt, q);
+    if(amount > 0 )
+    {
+    cout << " Pattern found 
+     " << endl;
+    }
+    cout << "There are a total of " << word_count << " in the txt that match" << endl;
+    return 0;
+
+    Then modify the search to this search(string pat, string txt, int q, int row);
+}
+*/
 int main()
 {
     string txt = "how much wood could a wood chuck chuck if a wood chuck could chuck wood";
@@ -77,8 +101,9 @@ int search(string pat, string txt, int q)
                     amount++;
                     auto tot_stop = std::chrono::high_resolution_clock::now();
                     auto tot_time = std::chrono::duration_cast<std::chrono::nanoseconds>(tot_stop - tot_start);
+                    cout << "Line " << i /* will fix this in a sec*/ << " in IX found your word!" << endl;
                     cout << "------------------------------------" << endl;
-                    cout << "Pattern found " << Wordplace(i, txt) << " words into the sentence" << endl;
+                    cout << "Word found " << Wordplace(i, txt) << " words into the sentence" << endl;
                     printf("\n");
 
                     cout << "\"" << txt << "\" " << endl;
