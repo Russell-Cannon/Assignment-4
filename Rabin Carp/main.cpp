@@ -13,7 +13,7 @@ int Wordplace(int, string);
 int main()
 {
     string txt = "how much wood could a wood chuck chuck if a wood chuck could chuck wood";
-    string pat = "o";
+    string pat = "wood";
     int q = INT_MAX;
     int word_count;
 
@@ -22,7 +22,6 @@ int main()
 
     word_count = search(pat, txt, q);
     cout << "There are a total of " << word_count << " in the txt that match" << endl;
-
     return 0;
 }
 
@@ -37,8 +36,6 @@ int search(string pat, string txt, int q)
     int h = 1;
     int d = 256; // d is the number of characters in the input alphabet
     int amount = 0;
-    int array;
-    int Word_placement[100] = {};
 
     /* start the clock for run time of both Rabin Carp and Las Vegas check */
     auto tot_start = std::chrono::high_resolution_clock::now();
@@ -78,13 +75,14 @@ int search(string pat, string txt, int q)
                 if (Las_vegas(pat, txt, i) == true)
                 {
                     amount++;
-                    Word_placement[array] = Wordplace(i, txt);
-                    array++;
                     auto tot_stop = std::chrono::high_resolution_clock::now();
                     auto tot_time = std::chrono::duration_cast<std::chrono::nanoseconds>(tot_stop - tot_start);
-                    
-                    cout << txt << endl;
-                    for(int o = 0;  o < i; o++)
+                    cout << "------------------------------------" << endl;
+                    cout << "Pattern found " << Wordplace(i, txt) << " words into the sentence" << endl;
+                    printf("\n");
+
+                    cout << "\"" << txt << "\" " << endl;
+                    for(int o = 0;  o < i+1; o++)
                     {
                         cout << " ";
                     }
@@ -92,10 +90,8 @@ int search(string pat, string txt, int q)
                     {
                         cout << "^";
                     }
-                    cout << endl;
-                    std::cout << "Rabin Carp time: " << tot_time.count() << " nanoseconds!" << std::endl;
-                    cout << endl;
-                    
+                    printf("\n");
+                    std::cout << "Rabin Carp time taken: " << tot_time.count() << " nanoseconds!" << std::endl;      
                 }
                 else
                 {
@@ -103,11 +99,10 @@ int search(string pat, string txt, int q)
                     auto tot_time = std::chrono::duration_cast<std::chrono::nanoseconds>(tot_stop - tot_start);
                     cout << "Pattern denied by Las Vegas check" << endl;
 
-                    std::cout << "Rabin Carp denial time: " << tot_time.count() << " nanoseconds!" << std::endl;
+                    std::cout << "Rabin Carp time: " << tot_time.count() << " nanoseconds!" << std::endl;
                 }
             }
         }
-
         // Calculate hash value for next window of text:
         // Remove leading digit, add trailing digit
         if (i < N - M)
@@ -118,7 +113,6 @@ int search(string pat, string txt, int q)
                 t = (t + q);
             }
         }
-    
     }
     if(amount == 0)
     {
@@ -127,15 +121,7 @@ int search(string pat, string txt, int q)
         auto tot_time = std::chrono::duration_cast<std::chrono::nanoseconds>(tot_stop - tot_start);
         std::cout << "Time elapsed: " << tot_time.count() << " nanoseconds!" << std::endl;
     }
-    if(amount != 0)
-    {
-        cout << "Words were found in places: ";
-        for(i = 0; i < amount; i++)
-        {
-            cout << Word_placement[i] << ", ";
-        }
-        cout << endl;
-    }
+    cout << "------------------------------------" << endl;
     return amount;
 }
 
