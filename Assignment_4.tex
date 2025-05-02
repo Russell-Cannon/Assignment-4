@@ -22,6 +22,8 @@
 \begin{abstract}
 \begin{center}
 citations
+https://www.geeksforgeeks.org/rabin-karp-algorithm-for-pattern-searching/
+https://www.geeksforgeeks.org/string-hashing-using-polynomial-rolling-hash-function/
 \end{center}
 \end{abstract}
 
@@ -40,6 +42,105 @@ in nanoseconds should be reported.
 \item
 Experimentation with different hash functions. A simple function such as f (r) = r\%hsize should be the
 initial attempt.
+
+Our first attempt: (based on Rabin-Karp hash)
+static int hash(const std::string& word, int size) {
+    int n = 0; // Hash value
+    int h = 1;
+    int d = 256; // d is the number of characters in the input alphabet 
+    // The value of h would be "pow(d, M-1)%q"
+    for (int i = 0; i < (int)word.size() - 1; i++)
+        h = (h * d) % size;
+
+    for (int i = 0; i < (int)word.size(); i++)
+        n = (d * n + word[i]) % size;
+
+    return abs(n);
+}
+
+Yield:
+Open Chaining:
+Number of lists: 8192
+Number of words stored: 5781
+Load Size (Lambda): 0.705688
+Maximum Chain Length: 740
+Minimum Chain Length: 0
+
+Linear Probing:
+Size of hashtable: 16384
+Number of words stored: 5576
+Load size (lambda): 0.340332
+Largest cluster: 4879
+Smallest cluster: 1
+Average cluster: 253.455
+
+Our second attempt: (Polynomial Rolling Hash from Geeks4Geeks)
+static int hash(const std::string& word, int size) {
+    int p = 31, m = 1e9 + 7, hashValue = 0, pPow = 1;
+
+    for (char c : word) {
+        hashValue = (hashValue + (c - ' ' + 1) * pPow) % m;
+        pPow = (pPow * p) % m;
+    }
+
+    return abs(hashValue % size);
+}
+
+yield:
+Open Chaining:
+Number of lists: 8192
+Number of words stored: 5781
+Load Size (Lambda): 0.705688
+Maximum Chain Length: 6
+Minimum Chain Length: 0
+
+Linear Probing:
+Size of hashtable: 16384
+Number of words stored: 5576
+Load size (lambda): 0.340332
+Largest cluster: 32
+Smallest cluster: 1
+Average cluster: 1.79491
+
+third attempt: (maps only the characters we allow)
+static int charToIndex(const char c) {
+    //-, a, b, ..., z, 0, 1, ... 9
+    if (c == '-') return 1;
+    if (c == '\'') return 2;
+    if (std::isalpha(c)) return c - 'a' + 3;
+    if (std::isdigit(c)) return c - '0' + 26 + 4;
+    return 0;
+}
+
+static int hash(const std::string& word, int size) {
+    int p = 31;
+    long int m = 1e9 + 7, hashValue = 0, pPow = 1;
+
+    for (char c : word) {
+        hashValue = (hashValue + charToIndex(c) * pPow) % m;
+        pPow = (pPow * p) % m;
+    }
+
+    return hashValue % size;
+}
+
+yield:
+Open Chaining:
+Number of lists: 8192
+Number of words stored: 5781
+Load Size (Lambda): 0.705688
+Maximum Chain Length: 5
+Minimum Chain Length: 0
+
+Linear Probing:
+Size of hashtable: 16384
+Number of words stored: 5576
+Load size (lambda): 0.340332
+Largest cluster: 21
+Smallest cluster: 1
+Average cluster: 1.80804
+
+
 
 \item
 Handling collisions in the table for linear probing. The collision resolution method implemented must be

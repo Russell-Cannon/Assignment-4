@@ -12,13 +12,13 @@ struct WordCount {
     int count;
 };
 
-class OpenHashTable {
+class OpenHashing {
 private:
     std::vector<std::list<WordCount>> open_hash_table;
     int size;
 
 public:
-    OpenHashTable(int s); // create hash table with specified size
+    OpenHashing(int s); // create hash table with specified size
 
     void readUntilVII(std::ifstream& in); // reads until the cleaned word "vii" (marks the end of Book VI)
     void insert(const std::string& raw_word); // clean and insert word into hash table
@@ -52,12 +52,12 @@ public:
 };
 
 // constructor
-OpenHashTable::OpenHashTable(int s) : size(s) {
+OpenHashing::OpenHashing(int s) : size(s) {
     open_hash_table.resize(size);
 }
 
 // Reads and inserts words until "vii"
-void OpenHashTable::readUntilVII(std::ifstream& inFile) {
+void OpenHashing::readUntilVII(std::ifstream& inFile) {
     std::string word;
     while (inFile >> word) {
         std::vector<std::string> words;
@@ -74,7 +74,7 @@ void OpenHashTable::readUntilVII(std::ifstream& inFile) {
 }
 
 // Insert a word (or increment if already exists) in hash table
-void OpenHashTable::insert(const std::string& raw_word) {
+void OpenHashing::insert(const std::string& raw_word) {
     std::string word = raw_word;
     clean_word(word);
     if (word.empty()) {
@@ -91,7 +91,7 @@ void OpenHashTable::insert(const std::string& raw_word) {
 }
 
 // Gets how many time a word appears (word count)
-int OpenHashTable::getWordCount(const std::string& raw_word) const {
+int OpenHashing::getWordCount(const std::string& raw_word) const {
     std::string word = raw_word;
     clean_word(word);
     int index = hash(word, size);
@@ -104,20 +104,20 @@ int OpenHashTable::getWordCount(const std::string& raw_word) const {
 }
 
 // Returns a deep copy of internal hash table
-std::vector<std::list<WordCount>> OpenHashTable::getOpenHashTable() const {
+std::vector<std::list<WordCount>> OpenHashing::getOpenHashTable() const {
     std::vector<std::list<WordCount>> copy = open_hash_table;
     return copy;
 }
 
 // Returns all word-count pairs unsorted, unchains words
-std::vector<WordCount> OpenHashTable::getAllWordsUnsorted() const {
+std::vector<WordCount> OpenHashing::getAllWordsUnsorted() const {
     std::vector<WordCount> words;
     fillAllWords(words);
     return words;
 }
 
 // Returns all word-count pairs sorted in descending order, unchains words
-std::vector<WordCount> OpenHashTable::getAllWordsSortedDescending() const {
+std::vector<WordCount> OpenHashing::getAllWordsSortedDescending() const {
     std::vector<WordCount> words;
     fillAllWords(words);
     sortWordCountsDescending(words);
@@ -125,7 +125,7 @@ std::vector<WordCount> OpenHashTable::getAllWordsSortedDescending() const {
 }
 
 // Returns all word-count pairs sorted in ascending order, unchains words
-std::vector<WordCount> OpenHashTable::getAllWordsSortedAscending() const {
+std::vector<WordCount> OpenHashing::getAllWordsSortedAscending() const {
     std::vector<WordCount> words;
     fillAllWords(words);
     sortWordCountsAscending(words);
@@ -133,7 +133,7 @@ std::vector<WordCount> OpenHashTable::getAllWordsSortedAscending() const {
 }
 
 // Helper function that fills parameter word-count pairs, unchains words
-void OpenHashTable::fillAllWords(std::vector<WordCount>& outWords) const {
+void OpenHashing::fillAllWords(std::vector<WordCount>& outWords) const {
     for (const auto& chain : open_hash_table) {
         for (const auto& wc : chain) {
             outWords.push_back(wc);
@@ -142,7 +142,7 @@ void OpenHashTable::fillAllWords(std::vector<WordCount>& outWords) const {
 }
 
 // prints n most frequent words
-void OpenHashTable::displayMostFrequent(int n) const {
+void OpenHashing::displayMostFrequent(int n) const {
     std::vector<WordCount> words;
     fillAllWords(words);
     sortWordCountsDescending(words);
@@ -152,7 +152,7 @@ void OpenHashTable::displayMostFrequent(int n) const {
 }
 
 // prints n least frequent words
-void OpenHashTable::displayLeastFrequent(int n) const {
+void OpenHashing::displayLeastFrequent(int n) const {
     std::vector<WordCount> words;
     fillAllWords(words);
     sortWordCountsAscending(words);
@@ -162,7 +162,7 @@ void OpenHashTable::displayLeastFrequent(int n) const {
 }
 
 // gets n most frequent words
-std::vector<WordCount> OpenHashTable::getMostFrequent(int n) const {
+std::vector<WordCount> OpenHashing::getMostFrequent(int n) const {
     std::vector<WordCount> words;
     fillAllWords(words);
     sortWordCountsDescending(words);
@@ -173,7 +173,7 @@ std::vector<WordCount> OpenHashTable::getMostFrequent(int n) const {
 }
 
 // gets n least frequent words
-std::vector<WordCount> OpenHashTable::getLeastFrequent(int n) const {
+std::vector<WordCount> OpenHashing::getLeastFrequent(int n) const {
     std::vector<WordCount> words;
     fillAllWords(words);
     sortWordCountsAscending(words);
@@ -185,7 +185,7 @@ std::vector<WordCount> OpenHashTable::getLeastFrequent(int n) const {
 }
 
 // insertion sort for quickSortHybrid
-void OpenHashTable::insertionSort(std::vector<WordCount>& vec, int low, int high, bool descending) const {
+void OpenHashing::insertionSort(std::vector<WordCount>& vec, int low, int high, bool descending) const {
     for (int i = low + 1; i <= high; ++i) {
         WordCount key = vec[i];
         int j = i - 1;
@@ -198,7 +198,7 @@ void OpenHashTable::insertionSort(std::vector<WordCount>& vec, int low, int high
 }
 
 // Quicksort partition using middle element as pivot
-int OpenHashTable::partition(std::vector<WordCount>& vec, int low, int high, bool descending) const {
+int OpenHashing::partition(std::vector<WordCount>& vec, int low, int high, bool descending) const {
     int mid = low + (high - low) / 2;
     WordCount pivot = vec[mid];
     std::swap(vec[mid], vec[high]);
@@ -214,7 +214,7 @@ int OpenHashTable::partition(std::vector<WordCount>& vec, int low, int high, boo
 }
 
 // Quicksort that switches to insertion sort for small sub vectors of size 20 or less
-void OpenHashTable::quickSortHybrid(std::vector<WordCount>& vec, int low, int high, bool descending) const {
+void OpenHashing::quickSortHybrid(std::vector<WordCount>& vec, int low, int high, bool descending) const {
     const int INSERTION_THRESHOLD = 20;
 
     if (low < high) {
@@ -229,21 +229,21 @@ void OpenHashTable::quickSortHybrid(std::vector<WordCount>& vec, int low, int hi
 }
 
 // Sort from most to least frequent
-void OpenHashTable::sortWordCountsDescending(std::vector<WordCount>& vec) const {
+void OpenHashing::sortWordCountsDescending(std::vector<WordCount>& vec) const {
     if (!vec.empty()) {
         quickSortHybrid(vec, 0, static_cast<int>(vec.size() - 1), true);
     }
 }
 
 // Sort from least to most frequent
-void OpenHashTable::sortWordCountsAscending(std::vector<WordCount>& vec) const {
+void OpenHashing::sortWordCountsAscending(std::vector<WordCount>& vec) const {
     if (!vec.empty()) {
         quickSortHybrid(vec, 0, static_cast<int>(vec.size() - 1), false);
     }
 }
 
 // convert to lowercase, also removes leading & trailing non-letter characters
-inline void OpenHashTable::clean_word(std::string& word) const {
+inline void OpenHashing::clean_word(std::string& word) const {
     // convert to lowercase
     for (size_t i = 0; i < word.length(); ++i) {
         if (isalpha(word[i])) {
@@ -265,7 +265,7 @@ inline void OpenHashTable::clean_word(std::string& word) const {
 }
 
 // splits & cleans punctuation, numbers, or any non-letter character. Preserves hyphens in middle of words
-inline void OpenHashTable::split_and_clean(const std::string& word, std::vector<std::string>& vec) {
+inline void OpenHashing::split_and_clean(const std::string& word, std::vector<std::string>& vec) {
     std::string current;
     for (size_t i = 0; i < word.length(); ++i) {
         char c = tolower(word[i]);

@@ -24,16 +24,16 @@ public:
                     resize();
 
                 int index = hash(w, size);
-                while (!arr[index].empty && arr[index].first != w) {
+                while (!arr[index].empty && arr[index].word != w) {
                     index = (index + 1) % size;
                 }
                 if (arr[index].empty) {
-                    arr[index].first = w;
+                    arr[index].word = w;
                     arr[index].empty = false;
                     occupancy++; //had to declare new space
                 }
-                arr[index].second++;
-                if (debug) std::cout << w << " (" << arr[index].second << ")\n";
+                arr[index].count++;
+                if (debug) std::cout << w << " (" << arr[index].count << ")\n";
             }
 
         }
@@ -42,7 +42,7 @@ public:
     void Output(std::ostream& out) {
         for (int i = 0; i < size; i++) {
             if (!arr[i].empty) {
-                out << arr[i].first << " (" << arr[i].second << ")\n";
+                out << arr[i].word << " (" << arr[i].count << ")\n";
             }
         }
     }
@@ -91,7 +91,7 @@ private:
         //rehash
         for (int i = 0; i < oldSize; i++) {
             if (!arr[i].empty) {
-                int index = hash(arr[i].first, size);
+                int index = hash(arr[i].word, size);
                 while (!newArr[index].empty) {
                     index = (index + 1) % size;
                 }

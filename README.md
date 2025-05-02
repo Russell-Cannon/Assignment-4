@@ -28,11 +28,14 @@ All files need .h headers
    - Ignore '!'
    - Count '?'
    - Count '.'
- - [ ] Paper
-   - [ ] Test with multiple hash functions
-   - [ ] Test with different occupancy ratios
+ - [x] Test multiple hash functions
+ - [ ] Test different occupancy ratios
+ - [ ] Split headers and cpps
+   - [ ] OpenHashing.h
+   - [ ] LinearProbing.h
+   - [ ] Function.h?
 
 # Division
-Russell - Combining open and linear hashing to project folder
-Patrick - Count sentances
+Russell - Writing paper?
+Patrick - Count sentences
 Ian - Rabin-Karp
