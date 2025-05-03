@@ -11,6 +11,7 @@ class OpenHashing {
 private:
     std::list<WordPair>* open_hash_table;
     int size, occupancy;
+    std::chrono::nanoseconds total_nanoseconds;
 
 public:
     OpenHashing(); // create hash table
@@ -21,6 +22,7 @@ public:
     void resize(); //Double the size of the hash_table.
     int getWordCount(const std::string& raw_word) const; // get how many times a word appears in the table
     void printChainStats(std::ostream& out) const; // Prints the average, max, and min chainlength in the table
+    std::chrono::nanoseconds getTotalNanoseconds(); // return total nanoseconds
 
     // these functions return a vector of the data in hash table
     std::vector<std::list<WordPair>> getOpenHashTable() const; // deep copy open hash table, keeps chains
@@ -42,7 +44,7 @@ public:
 };
 
 // constructor
-OpenHashing::OpenHashing() : size(64), occupancy(0) {
+OpenHashing::OpenHashing() : size(64), occupancy(0), total_nanoseconds(0) {
     open_hash_table = new std::list<WordPair> [size];
 }
 
@@ -56,16 +58,24 @@ void OpenHashing::readUntil(std::ifstream& inFile, std::string delimiter) {
     std::string word;
     while (inFile >> word) {
         std::vector<std::string> words;
+        auto time_start = std::chrono::high_resolution_clock::now();
         clean_and_split(word, words);
         for (std::string w : words) {
-            clean(w);
+            clean(w); // question, do we need this since we called clean_and_split() before which already calls clean() internally?
             if (w == delimiter) {
                 return;
             }
 
             insert(w);
         }
+        auto time_stop = std::chrono::high_resolution_clock::now();
+        auto time_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(time_stop - time_start);
+        total_nanoseconds += time_duration;
     }
+}
+
+std::chrono::nanoseconds OpenHashing::getTotalNanoseconds() {
+    return total_nanoseconds;
 }
 
 // Insert a word (or increment if already exists) in hash table
@@ -132,6 +142,7 @@ void OpenHashing::printChainStats(std::ostream& out) const {
     out << "Load Size (Lambda): " << (double)occupancy/size << "\n";
     out << "Maximum Chain Length: " << max << "\n";
     out << "Minimum Chain Length: " << min << "\n";
+    out << "Total Runtime in Nanoseconds: " << total_nanoseconds.count() << '\n';
 }
 
 // Returns all word-count pairs sorted in descending order, unchains words

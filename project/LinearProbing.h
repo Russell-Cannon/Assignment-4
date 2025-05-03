@@ -8,14 +8,14 @@
 
 class LinearProbing {
 public:
-    LinearProbing() {
+    LinearProbing() : total_nanoseconds(0) {
         arr = new WordPair [size];
     }
-    LinearProbing(std::istream& in) {
+    LinearProbing(std::istream& in) : total_nanoseconds(0) {
         arr = new WordPair [size];
         read(in);
     }
-    LinearProbing(std::vector<WordPair>& in) {
+    LinearProbing(std::vector<WordPair>& in) : total_nanoseconds(0) {
         arr = new WordPair [size];
         read(in);
     }
@@ -26,9 +26,13 @@ public:
     void read(std::istream& in) {
         std::string word;
         while (in >> word) {
+            auto time_start = std::chrono::high_resolution_clock::now();
             for (std::string w : clean_and_split(word)) { //Usually just one, sometimes two
                 addElement(WordPair(w, 1));
             }
+            auto time_stop = std::chrono::high_resolution_clock::now();
+            auto time_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(time_stop - time_start);
+            total_nanoseconds += time_duration;
         }
     }
 
@@ -36,19 +40,31 @@ public:
         clean(end);
         std::string word;
         while (in >> word) {
+            auto time_start = std::chrono::high_resolution_clock::now();
             for (std::string w : clean_and_split(word)) { //Usually just one, sometimes two
                 if (w == end)
                     return;
 
                 addElement(WordPair(w, 1));
             }
+            auto time_stop = std::chrono::high_resolution_clock::now();
+            auto time_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(time_stop - time_start);
+            total_nanoseconds += time_duration;
         }
     }
 
     void read(std::vector<WordPair>& in) {
+        auto time_start = std::chrono::high_resolution_clock::now();
         for (WordPair pair : in) {
             addElement(pair);
         }
+        auto time_stop = std::chrono::high_resolution_clock::now();
+        auto time_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(time_stop - time_start);
+        total_nanoseconds += time_duration;
+    }
+
+    std::chrono::nanoseconds getTotalNanoseconds() { 
+        return total_nanoseconds;
     }
 
     void output(std::ostream& out) {
@@ -85,6 +101,7 @@ public:
         out << "Largest cluster: " << maxClusterSize << '\n';
         out << "Smallest cluster: " << minClusterSize << '\n';
         out << "Average cluster: " << (double)sumClusterSize/numClusters << '\n';
+        out << "Total Runtime in Nanoseconds: " << total_nanoseconds.count() << '\n';
     }
 
     std::vector<WordPair> getMostFrequent(int K) {
@@ -121,6 +138,7 @@ public:
 private:
     int size = 64, occupancy = 0;
     WordPair* arr = nullptr;
+    std::chrono::nanoseconds total_nanoseconds;
 
     void addElement(WordPair pair) {
         if (occupancy*2 >= size)

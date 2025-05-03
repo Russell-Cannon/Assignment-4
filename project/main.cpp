@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 int main() {
     std::ifstream in("A Scandal In Bohemia.txt");
@@ -12,7 +13,8 @@ int main() {
         std::cerr << "Failed to open input file.\n";
         return 1;
     }
-    
+    std::chrono::nanoseconds total_time = std::chrono::nanoseconds(0);
+
     // Works I through VI should be stored using open hashing (separate chaining)
     OpenHashing open;
     open.readUntil(in, "VII");
@@ -21,11 +23,13 @@ int main() {
     LinearProbing linear;
     linear.readUntil(in, "IX"); //read up until we hit Chapter 9.
 
+
     //As the program starts processing work IX “The Adventure of the Engineer’s Thumb”, it should prompt the user for search key
     //display the position of each key’s occurrence in the text
     //Rabin-Karp pattern matching algorithm and Horner’s rule for the rolling hash should be utilized for this purpose
 
     linear.read(in); //read until end
+    
     
     // Once the data is processed, the program should display and record to a file a list of word occurrences from highest to lowest vice versa of the 80 most and least repeated words (and their count)
     const int N = 80;
@@ -53,6 +57,10 @@ int main() {
     open.printChainStats(stats);
     stats << "\nLinear Probing:\n";
     linear.printStats(stats);
+
+    // can use getters from classes to get the total runtime
+    total_time = open.getTotalNanoseconds() + linear.getTotalNanoseconds();
+    std::cout << "Total time for open and linear: " << total_time.count() << std::endl;
 
     stats.close();
     mostOut.close();
