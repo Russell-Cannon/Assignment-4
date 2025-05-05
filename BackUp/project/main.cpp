@@ -2,17 +2,17 @@
 #include "LinearProbing.h"
 #include "OpenHashing.h"
 #include "WordPair.h"
+#include "Rabin.h" //only function needed to call here is int Rabin(row), row is what row on the .txt we are one
 #include <fstream>
 #include <iostream>
 #include <vector>
-<<<<<<< HEAD
 #include <chrono>
-#include <string>
-=======
->>>>>>> 578266ddd642b010855d18e71358886b4497ccf1
 
 int main() {
     std::ifstream in("A Scandal In Bohemia.txt");
+    string key;
+    int user;
+ 
     if (!in.is_open()) {
         std::cerr << "Failed to open input file.\n";
         return 1;
@@ -26,7 +26,6 @@ int main() {
     LinearProbing linear;
     linear.readUntil(in, "IX"); //read up until we hit Chapter 9.
 
-<<<<<<< HEAD
     cout << "Would you like to find words in 'A Scandal In Bohemia'?" << endl;
     cout << "0: no, end program..." << endl << "1: yes, pattern match..." << endl;
     if (user == 0)
@@ -36,35 +35,23 @@ int main() {
     }
     if (user == 1)
     {
-        std::cout << "up to 8 searches per run, use '@@@' to state the end of your string if under 8 words to search.";
-        std::cout << "Please state all your keys you want to search for: ";
-        std::cin >> key;
-        for (int i = 0; i <= key.size(); i++)
+        for (int i = 0; i <= 8; i++)
         {
-            while(key != " " && key != "@@@")
+            if(key == "@@@")
             {
-                if(key == "@@@")
-                {
-                    cerr << "Break out character detected, exiting" << endl;
-                    break;
-                }
-                std::getline(std::cin, key);
+                break;
             }
+            std::cin >> key;
         }
     }
-    
-    while("X. THE ADVENTURE OF THE NOBLE BACHELOR")
-    {
-        std::getline(std::cin, in, "\n");
-    }
-=======
->>>>>>> 578266ddd642b010855d18e71358886b4497ccf1
+    std::cout << "Please state search keys (up to 8, use : ";
 
     //As the program starts processing work IX “The Adventure of the Engineer’s Thumb”, it should prompt the user for search key
     //display the position of each key’s occurrence in the text
     //Rabin-Karp pattern matching algorithm and Horner’s rule for the rolling hash should be utilized for this purpose
 
     linear.read(in); //read until end
+    
     
     // Once the data is processed, the program should display and record to a file a list of word occurrences from highest to lowest vice versa of the 80 most and least repeated words (and their count)
     const int N = 80;
