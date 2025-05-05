@@ -13,8 +13,7 @@ int search(string pat, string txt, int q);
 bool Las_vegas(string, string, int);
 int Wordplace(int, string);
 
-int Rabin(int row);
-
+int Rabin(string txt, string pat, int row);
 
 // Search the pat string in the txt string
 int search(string pat, string txt, int q);
@@ -22,6 +21,7 @@ int search(string pat, string txt, int q);
 bool Las_vegas(string pat, string txt, int i);
 
 int Wordplace(int index, string txt);
+
 
 /*
     auto tot_start = std::chrono::high_resolution_clock::now();

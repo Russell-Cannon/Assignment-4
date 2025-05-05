@@ -1,9 +1,7 @@
 #include "Rabin.h"
 
-int Rabin(int row)
+int Rabin(string txt, string pat, int row)
 {
-    string txt = "how much wood could a wood chuck chuck if a wood chuck could chuck wood";
-    string pat = "wood";
     int q = 0b1111111111111111111111111111111;
     int word_count;
 
@@ -14,7 +12,7 @@ int Rabin(int row)
     
     if(word_count > 0 )
     {
-    cout << " Pattern found on row: "<< row << endl;
+        cout << "Pattern found on row: "<< row << endl;
     }
     cout << "There are a total of " << word_count << " in the txt that match" << endl;
     return 0;
@@ -70,7 +68,6 @@ int search(string pat, string txt, int q)
                     amount++;
                     auto tot_stop = std::chrono::high_resolution_clock::now();
                     auto tot_time = std::chrono::duration_cast<std::chrono::nanoseconds>(tot_stop - tot_start);
-                    cout << "Line " << i /* will fix this in a sec*/ << " in IX found your word!" << endl;
                     cout << "------------------------------------" << endl;
                     cout << "Word found " << Wordplace(i, txt) << " words into the sentence" << endl;
                     printf("\n");

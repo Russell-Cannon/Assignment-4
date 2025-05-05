@@ -2,6 +2,7 @@
 #include "LinearProbing.h"
 #include "OpenHashing.h"
 #include "WordPair.h"
+#include "Rabin.h"
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -11,7 +12,10 @@
 int main() {
     std::ifstream in("A Scandal In Bohemia.txt");
     int user;
-    std::string key;
+    std::string text;
+    std::string temptext;
+    int row;
+    std::string key[10000] = {}; //I think this is causing errors to prevent run from working
 
     if (!in.is_open()) {
         std::cerr << "Failed to open input file.\n";
@@ -26,36 +30,44 @@ int main() {
     LinearProbing linear;
     linear.readUntil(in, "IX"); //read up until we hit Chapter 9.
 
-    std::cout << "Would you like to find words in 'A Scandal In Bohemia'?" << std::endl;
+    std::cout << "Would you like to find words in 'The Adventure of the Engineer’s Thumb'?" << std::endl;
     std::cout << "0: no, end program..." << std::endl << "1: yes, pattern match..." << std::endl;
     if (user == 0)
     {
-        std::cout << "ending program...";
+        std::cout << "skipping program...";
         return 0;
     }
-    if (user == 1)
+    else if (user == 1)
     {
         std::cout << "up to 8 searches per run, use '@@@' to state the end of your string if under 8 words to search.";
         std::cout << "Please state all your keys you want to search for: ";
-        std::cin >> key;
-        for (int i = 0; i <= key.size(); i++)
+        for(int i = 0; i < sizeof(key); i++)
         {
-            while(key != " " && key != "@@@")
+            std::string tempkey;
+            std::cin >> tempkey;
+            key[i] = tempkey;
+        }
+        for (int i = 0; i <= sizeof(key); i++)
+        {
+            std::getline(std::cin, key[i], ' ');
+            if(key[i] == "@@@")
             {
-                if(key == "@@@")
-                {
-                    std::cerr << "Break out character detected, exiting" << std::endl;
-                    break;
-                }
-                std::getline(std::cin, key);
+                std::cerr << "Break out character detected, exiting" << std::endl;
+                break;
             }
+
+            //while(in != "X. THE ADVENTURE OF THE NOBLE BACHELOR") essentially, if we see "X. THE ADVENTURE OF THE NOBLE BACHELOR", stop reading
+            //{
+                while(std::getline(in, text))
+                {
+                    text += temptext + "\n";
+                    Rabin(text, key[i], row); //obtain which row you are on and pass that into rabin, 
+                }
+            //}
         }
     }
-    
-    while("X. THE ADVENTURE OF THE NOBLE BACHELOR")
-    {
-        std::getline(std::cin, in, "\n");
-    }
+
+
 
     //As the program starts processing work IX “The Adventure of the Engineer’s Thumb”, it should prompt the user for search key
     //display the position of each key’s occurrence in the text
