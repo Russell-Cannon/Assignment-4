@@ -130,9 +130,14 @@ int OpenHashing::getWordCount(const std::string& raw_word) const {
  // Returns the average chainlength in the table
 void OpenHashing::printChainStats(std::ostream& out) const {
     int max = open_hash_table[0].size(), min = max;
+    int numNonZero = 0, sumNonZero = 0;
     
     for (int i = 0; i < size; i++) {
         int n = open_hash_table[i].size();
+        if (n != 0) {
+            numNonZero++;
+            sumNonZero += n;
+        }
         if (max < n) max = n;
         if (min > n) min = n;
     }
@@ -142,6 +147,7 @@ void OpenHashing::printChainStats(std::ostream& out) const {
     out << "Load Size (Lambda): " << (double)occupancy/size << "\n";
     out << "Maximum Chain Length: " << max << "\n";
     out << "Minimum Chain Length: " << min << "\n";
+    out << "Average Chain Length (excluding 0): " << (double) sumNonZero / numNonZero << '\n';
     out << "Total Runtime in Nanoseconds: " << total_nanoseconds.count() << '\n';
 }
 

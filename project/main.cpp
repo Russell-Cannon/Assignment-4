@@ -13,7 +13,6 @@ int main() {
         std::cerr << "Failed to open input file.\n";
         return 1;
     }
-    std::chrono::nanoseconds total_time = std::chrono::nanoseconds(0);
 
     // Works I through VI should be stored using open hashing (separate chaining)
     OpenHashing open;
@@ -59,8 +58,8 @@ int main() {
     linear.printStats(stats);
 
     // can use getters from classes to get the total runtime
-    total_time = open.getTotalNanoseconds() + linear.getTotalNanoseconds();
-    std::cout << "Total time for open and linear: " << total_time.count() << std::endl;
+    std::chrono::nanoseconds total_time = open.getTotalNanoseconds() + linear.getTotalNanoseconds();
+    std::cout << "Total time for open and linear: " << total_time.count() << '\n';
 
     stats.close();
     mostOut.close();
