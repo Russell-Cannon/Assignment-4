@@ -39,18 +39,6 @@ static int hash(const std::string& word, int size) {
     return hashValue % size;
 }
 
-static int hash(int value, int size) {
-    int p = 31;
-    long int m = 1e9 + 7, hashValue = 0, pPow = 1;
-
-    for (int i = 0; i < 3; i++) {
-        hashValue = (hashValue + value * pPow) % m;
-        pPow = (pPow * p) % m;
-    }
-
-    return hashValue % size;
-}
-
 static void clean(std::string& word) 
 {
     // It’s important to note that capitalization should not matter (i.e., “Watson” and “watson” should be counted as the same word)
