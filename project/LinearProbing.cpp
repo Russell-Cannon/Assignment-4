@@ -130,7 +130,7 @@ std::vector<WordPair> LinearProbing::getLeastFrequent(int K) {
 }
 
 void LinearProbing::addElement(WordPair pair) {
-    if (occupancy*2 >= size)
+    if (4*occupancy/size >= 3)
         resize();
 
     int index = hash(pair.word, size);
