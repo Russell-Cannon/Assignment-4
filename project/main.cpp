@@ -5,11 +5,8 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-<<<<<<< HEAD
 #include <chrono>
 #include <string>
-=======
->>>>>>> 578266ddd642b010855d18e71358886b4497ccf1
 
 int main() {
     std::ifstream in("A Scandal In Bohemia.txt");
@@ -26,39 +23,6 @@ int main() {
     LinearProbing linear;
     linear.readUntil(in, "IX"); //read up until we hit Chapter 9.
 
-<<<<<<< HEAD
-    cout << "Would you like to find words in 'A Scandal In Bohemia'?" << endl;
-    cout << "0: no, end program..." << endl << "1: yes, pattern match..." << endl;
-    if (user == 0)
-    {
-        cout << "ending program...";
-        return 0;
-    }
-    if (user == 1)
-    {
-        std::cout << "up to 8 searches per run, use '@@@' to state the end of your string if under 8 words to search.";
-        std::cout << "Please state all your keys you want to search for: ";
-        std::cin >> key;
-        for (int i = 0; i <= key.size(); i++)
-        {
-            while(key != " " && key != "@@@")
-            {
-                if(key == "@@@")
-                {
-                    cerr << "Break out character detected, exiting" << endl;
-                    break;
-                }
-                std::getline(std::cin, key);
-            }
-        }
-    }
-    
-    while("X. THE ADVENTURE OF THE NOBLE BACHELOR")
-    {
-        std::getline(std::cin, in, "\n");
-    }
-=======
->>>>>>> 578266ddd642b010855d18e71358886b4497ccf1
 
     //As the program starts processing work IX “The Adventure of the Engineer’s Thumb”, it should prompt the user for search key
     //display the position of each key’s occurrence in the text
