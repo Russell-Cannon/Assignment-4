@@ -29,14 +29,6 @@ https://www.geeksforgeeks.org/string-hashing-using-polynomial-rolling-hash-funct
 
 \newpage
 
-\section{Experimenting with occupancy ratios in linear probing}
-The occupancy ratio to be used in linear probing. This involves experimenting with different values such
-as 50\%, 70\%, and 80\%, and reporting runtimes in nanoseconds.
-
-\section {Optimizing chain length in open hashing}
-At least three experiments should be conducted, and runtimes
-in nanoseconds should be reported.
-
 \section{Experimentation with different hash functions}
 \subsection{Simple Hash}
 \begin{lstlisting}[language=C++]
@@ -64,6 +56,8 @@ Linear & 283 & 0.340332 & 5481 & 1 & 242.435\\
 \end{tabular}
 \end{center}
 
+The simple hash function suggested works but causes considerable collisions.
+
 \subsection{Rabin-Karp Hash}
 
 \begin{lstlisting}[language=C++]
@@ -89,6 +83,8 @@ Linear & 80 & 0.340332 & 4879 & 1 & 242.435\\
 \hline
 \end{tabular}
 \end{center}
+
+This hash function modified from the suggested hash function used in the Rabin-Karp pattern matching algorithm turned out to be worse than the most simple hash function when it comes to separate chaining, but better for linear probing. Chain lengths are out of control in this hash function and the times are marginally worse for open hashing. The linear probing times are considerably better, but the size of clusters is about the same.
 
 \subsection{Polynomial Rolling Hash}
 
@@ -118,6 +114,8 @@ Linear & 24 & 0.340332 & 32 & 1 & 1.79491\\
 \hline
 \end{tabular}
 \end{center}
+
+The runtime for open chaining is actually worse for this hash function every other statistic is improved exponentially.
 
 \subsection{Polynomial Rolling Hash With Reduced Alphabet}
 
@@ -158,6 +156,87 @@ Linear & 21 & 0.340332 & 14 & 1 & 1.80804\\
 \end{tabular}
 \end{center}
 
+The max chain length and the runtime for linear probing are marginally improved but the runtime for open chaining is finally down. Due to continually reduced gains, this hashing method was decided to be best for our use case.
+
+\section{Experimenting with occupancy ratios in linear probing}
+\subsection{$\lambda < 0.5$}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Cutoff & Time(ns) & Lambda & \multicolumn{3}{|c|}{Cluster Size} \\
+ & & & Max & Min & Mean (non-zero) \\
+\hline
+0.5 & 22713966 & 0.340332 & 14 & 1 & 1.8022 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{$\lambda < 0.9$}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Cutoff & Time(ns) & Lambda & \multicolumn{3}{|c|}{Cluster Size} \\
+ & & & Max & Min & Mean (non-zero) \\
+\hline
+0.5 & 25118597 & 0.680664 & 14 & 1 & 1.8022 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{$\lambda < 0.75$}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Cutoff & Time(ns) & Lambda & \multicolumn{3}{|c|}{Cluster Size} \\
+ & & & Max & Min & Mean (non-zero) \\
+\hline
+0.5 & 20272493 & 0.680664 & 14 & 1 & 1.8022 \\
+\hline
+\end{tabular}
+\end{center}
+On average, keeping lambda under 0.75 provided the best run times for linear probing.
+
+\section {Optimizing chain length in open hashing}
+
+\subsection{$\lambda < 1$}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Cutoff & Time(ns) & Lambda & \multicolumn{3}{|c|}{Chain Length} \\
+ & & & Max & Min & Mean (non-zero) \\
+\hline
+1 & 43936770 & 0.705688 & 5 & 0 & 1.389 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{$\lambda < 0.5$}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Cutoff & Time(ms) & Lambda & \multicolumn{3}{|c|}{Chain Length} \\
+ & & & Max & Min & Mean (non-zero) \\
+\hline
+0.5 & 28392585 & 0.352844 & 4 & 0 & 1.18755 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{$\lambda < 0.9$}
+Y. Daniel Yiang recommends a lambda under 0.9 for separate chaining
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Cutoff & Time(ms) & Lambda & \multicolumn{3}{|c|}{Chain Length} \\
+ & & & Max & Min & Mean (non-zero) \\
+\hline
+0.9 & 24714102 & 0.705688 & 5 & 0 & 1.389 \\
+\hline
+\end{tabular}
+\end{center}
+
+Keeping lambda under 0.9 provided the best run times in separate chaining.
+
 \section{Handling collisions in the table for linear probing}
 Handling collisions in the table for linear probing. The collision resolution method implemented must be
 described, with research and inclusion of a method described in the lecture.
@@ -170,21 +249,210 @@ while (!arr[index].empty && arr[index].word != pair.word) {
 }
 \end{lstlisting}
 
-\subsection{Double Hash}
+\subsection{Quadratic Probing}
 \begin{lstlisting}[language=C++]
 int index = hash(pair.word, size);
-while (!arr[index].empty && arr[index].word != pair.word) {
-    index = (index + hash(index, size)) % size;
+for (int i = 1; !arr[index].empty && arr[index].word != pair.word; i++) {
+    index = (index + i*i) % size;
 }
 \end{lstlisting}
 
+\begin{center}
+Results\\
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Probe type & Time(ms) & Lambda & \multicolumn{3}{|c|}{Cluster Size} \\
+ & & & Max & Min & Mean (non-zero) \\
+\hline
+Linear & 21 & 0.340332 & 14 & 1 & 1.80804\\
+Quadratic & 32 & 0.340332 & 13 & 1 & 1.77799\\
+\hline
+\end{tabular}
+\end{center}
+
+Despite marginal improvements in custer size, the quadratic probing adds considerable runtime to our program. It was decided we would stick with linear probing.
+
 \section{Rabin-Karp}
-Writing a function to prompt a user for a word, display the number of occurrences of this word in the
-text, and the locations of said occurrences in “The Adventure of the Engineer’s Thumb”.
+Writing a function to prompt a user for a word, display the number of occurrences of this word in the text, and the locations of said occurrences in “The Adventure of the Engineer’s Thumb”.
 
 \section{80 Least and most frequent words}
-Implementing a function to output a list of the 80 least frequently occurring words in the text.
 
-Implementing a function to output a list of the 80 most frequently occurring words in the text.
+Linear probing creates a heap and pushes all the words in the hash table onto it. Then, it pops the top of the heap 80 times for the most frequently occurring words. The same method must be repeated for the least frequent words.
+
+Separate chaining creates a new array the size of the occupancy in the hash table, sets everything in the hash table to an index in the array, and sorts the array. It reads the top 80 words in the sorted array and the bottom 80 words in the array for the most and least frequent words.
+
+After both hashing methods are complete, we create another hash table (using linear probing) to combine the most frequent words in works I through VI (the separate chaining hash table) and works VII through XII (the linear probing hash table). Then the same is repeated for the least frequent words.
+
+\newpage
+\subsection{Most Frequent Words}
+\begin{enumerate}
+\item the: 2855
+\item i: 1602
+\item and: 1485
+\item to: 1392
+\item a: 1353
+\item of: 1311
+\item that: 923
+\item in: 894
+\item it: 889
+\item  you: 803
+\item  was: 696
+\item  he: 661
+\item  is: 581
+\item  my: 580
+\item  his: 514
+\item  have: 474
+\item  had: 434
+\item  with: 419
+\item  at: 418
+\item  which: 404
+\item  as: 403
+\item  for: 374
+\item  me: 358
+\item  but: 338
+\item  be: 335
+\item  not: 308
+\item  we: 287
+\item  this: 278
+\item  there: 265
+\item  her: 262
+\item  said: 259
+\item  she: 252
+\item  so: 250
+\item  from: 236
+\item  your: 218
+\item  holmes: 213
+\item  upon: 212
+\item  been: 207
+\item  very: 207
+\item  no: 206
+\item  all: 204
+\item  one: 202
+\item  what: 196
+\item  him: 195
+\item  then: 194
+\item  on: 188
+\item  were: 185
+\item  are: 182
+\item  by: 173
+\item  into: 164
+\item  out: 163
+\item  when: 162
+\item  an: 161
+\item  would: 161
+\item  has: 160
+\item  up: 155
+\item  little: 151
+\item  could: 146
+\item  who: 142
+\item  man: 135
+\item  do: 134
+\item  now: 133
+\item  will: 133
+\item  our: 131
+\item  should: 130
+\item  if: 128
+\item  see: 118
+\item  mr: 114
+\item  some: 112
+\item  down: 110
+\item  think: 106
+\item  over: 101
+\item  may: 99
+\item  they: 95
+\item  shall: 93
+\item  before: 91
+\item  door: 91
+\item  only: 91
+\item  more: 90
+\item  can: 89
+\end{enumerate}
+
+\newpage
+\subsection{Least Frequent Words}
+Because there are any number of words that are only used once, the sorting method we used defaults to sorting words by their alphabetic position if their counts are the same.
+
+\begin{enumerate}
+\item zigzag: 1
+\item zest: 1
+\item zero-point: 1
+\item youngster: 1
+\item you've: 1
+\item yonder: 1
+\item yellow-backed: 1
+\item yell: 1
+\item yawning: 1
+\item xii: 1
+\item xi: 1
+\item x: 1
+\item wrote: 1
+\item writhing: 1
+\item wrists: 1
+\item wrinkles: 1
+\item wrenching: 1
+\item wreaths: 1
+\item wreath: 1
+\item wounded: 1
+\item worst: 1
+\item worry: 1
+\item worm-eaten: 1
+\item worlds: 1
+\item world-wide: 1
+\item workmen: 1
+\item worked: 1
+\item wooing: 1
+\item wooden-legged: 1
+\item wooden-leg: 1
+\item wonderfully: 1
+\item wonderful: 1
+\item wondered: 1
+\item womanly: 1
+\item womanhood: 1
+\item woke: 1
+\item withdraw: 1
+\item wishing: 1
+\item wisely: 1
+\item wiry: 1
+\item wintry: 1
+\item winter: 1
+\item wink: 1
+\item wine-cellar: 1
+\item window-sill: 1
+\item windfall: 1
+\item wind-swept: 1
+\item wincing: 1
+\item wimpole: 1
+\item wilton: 1
+\item will-o'-the-wisp: 1
+\item wigmore: 1
+\item widow: 1
+\item wicket: 1
+\item wicker-work: 1
+\item wholesome: 1
+\item whoever: 1
+\item whittington: 1
+\item whiter: 1
+\item whiten: 1
+\item white-counterpaned: 1
+\item white-aproned: 1
+\item whisky: 1
+\item whishing: 1
+\item whined: 1
+\item whine: 1
+\item whims: 1
+\item wherever: 1
+\item where's: 1
+\item whenever: 1
+\item wheels: 1
+\item westphail: 1
+\item western: 1
+\item westbury: 1
+\item westaway's: 1
+\item westaway: 1
+\item well-to-do: 1
+\item well-opened: 1
+\item well-cut: 1
+\item weighed: 1
+\end{enumerate}
 
 \end{document}
