@@ -10,6 +10,9 @@
 
 int main() {
     std::ifstream in("A Scandal In Bohemia.txt");
+    int user;
+    std::string key;
+
     if (!in.is_open()) {
         std::cerr << "Failed to open input file.\n";
         return 1;
@@ -23,6 +26,36 @@ int main() {
     LinearProbing linear;
     linear.readUntil(in, "IX"); //read up until we hit Chapter 9.
 
+    std::cout << "Would you like to find words in 'A Scandal In Bohemia'?" << std::endl;
+    std::cout << "0: no, end program..." << std::endl << "1: yes, pattern match..." << std::endl;
+    if (user == 0)
+    {
+        std::cout << "ending program...";
+        return 0;
+    }
+    if (user == 1)
+    {
+        std::cout << "up to 8 searches per run, use '@@@' to state the end of your string if under 8 words to search.";
+        std::cout << "Please state all your keys you want to search for: ";
+        std::cin >> key;
+        for (int i = 0; i <= key.size(); i++)
+        {
+            while(key != " " && key != "@@@")
+            {
+                if(key == "@@@")
+                {
+                    std::cerr << "Break out character detected, exiting" << std::endl;
+                    break;
+                }
+                std::getline(std::cin, key);
+            }
+        }
+    }
+    
+    while("X. THE ADVENTURE OF THE NOBLE BACHELOR")
+    {
+        std::getline(std::cin, in, "\n");
+    }
 
     //As the program starts processing work IX “The Adventure of the Engineer’s Thumb”, it should prompt the user for search key
     //display the position of each key’s occurrence in the text
