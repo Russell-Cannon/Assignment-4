@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <string>
 
 int main() {
     std::ifstream in("A Scandal In Bohemia.txt");
@@ -35,16 +36,27 @@ int main() {
     }
     if (user == 1)
     {
-        for (int i = 0; i <= 8; i++)
+        std::cout << "up to 8 searches per run, use '@@@' to state the end of your string if under 8 words to search.";
+        std::cout << "Please state all your keys you want to search for: ";
+        std::cin >> key;
+        for (int i = 0; i <= key.size(); i++)
         {
-            if(key == "@@@")
+            while(key != " " && key != "@@@")
             {
-                break;
+                if(key == "@@@")
+                {
+                    cerr << "Break out character detected, exiting" << endl;
+                    break;
+                }
+                std::getline(std::cin, key);
             }
-            std::cin >> key;
         }
     }
-    std::cout << "Please state search keys (up to 8, use : ";
+    
+    while("X. THE ADVENTURE OF THE NOBLE BACHELOR")
+    {
+        std::getline(std::cin, in, "\n");
+    }
 
     //As the program starts processing work IX “The Adventure of the Engineer’s Thumb”, it should prompt the user for search key
     //display the position of each key’s occurrence in the text
