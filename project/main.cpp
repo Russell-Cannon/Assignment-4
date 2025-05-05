@@ -2,6 +2,7 @@
 #include "LinearProbing.h"
 #include "OpenHashing.h"
 #include "WordPair.h"
+#include "Rabin.h" //only function needed to call here is int Rabin(row), row is what row on the .txt we are one
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -9,6 +10,7 @@
 
 int main() {
     std::ifstream in("A Scandal In Bohemia.txt");
+    string key;
     if (!in.is_open()) {
         std::cerr << "Failed to open input file.\n";
         return 1;
@@ -22,7 +24,20 @@ int main() {
     LinearProbing linear;
     linear.readUntil(in, "IX"); //read up until we hit Chapter 9.
 
+    std::cout << "Please state search keys (up to 8): ";
+    for (int i = 0; i <= 8; i++)
+    {
+        if(key == "@@@")
+        {
+            break;
+        }
+        std::cin >> key;
+    }
 
+    for (int i = 0; i <= 8; i++)
+    {
+
+    }
     //As the program starts processing work IX “The Adventure of the Engineer’s Thumb”, it should prompt the user for search key
     //display the position of each key’s occurrence in the text
     //Rabin-Karp pattern matching algorithm and Horner’s rule for the rolling hash should be utilized for this purpose

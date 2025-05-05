@@ -42,7 +42,7 @@ int search(string pat, string txt, int q)
     int pattern = 0; // hash value for pattern
     int text = 0; // hash value for txt
     int h = 1;
-    int d = 256; // d is the number of characters in the input ASCII alphabet
+    int d = 256; // ASCII alphabet size
     int amount = 0;
 
     /* start the clock for run time of both Rabin Carp and Las Vegas check */
