@@ -24,6 +24,8 @@ All files need .h headers
  - [x] Detect chapter headings and split input for open hashing and linear probing
  - [ ] Pattern matching
  - [ ] Report times
+   - [ ] Open hashing
+   - [ ] Linear probing
  - [x] Count sentences
    - Ignore '!'
    - Count '?'
@@ -35,7 +37,9 @@ All files need .h headers
    - [ ] LinearProbing.h
    - [ ] Function.h?
 
+Remember to turn on light mode
+
 # Division
-Russell - Writing paper?
-Patrick - Count sentences
+Russell - Writing paper
+Patrick - Reporting times
 Ian - Rabin-Karp

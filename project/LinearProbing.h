@@ -146,7 +146,7 @@ private:
 
         int index = hash(pair.word, size);
         while (!arr[index].empty && arr[index].word != pair.word) {
-            index = (index + 1) % size;
+            index = (index + hash(index, size)) % size;
         }
         if (arr[index].empty) { //Does not already exist
             arr[index].word = pair.word;

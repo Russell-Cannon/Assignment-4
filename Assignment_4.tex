@@ -29,52 +29,71 @@ https://www.geeksforgeeks.org/string-hashing-using-polynomial-rolling-hash-funct
 
 \newpage
 
-\section{Key Reports}
-\begin{enumerate}
-\item 
+\section{Experimenting with occupancy ratios in linear probing}
 The occupancy ratio to be used in linear probing. This involves experimenting with different values such
 as 50\%, 70\%, and 80\%, and reporting runtimes in nanoseconds.
 
-\item
-Optimizing chain length in open hashing. At least three experiments should be conducted, and runtimes
+\section {Optimizing chain length in open hashing}
+At least three experiments should be conducted, and runtimes
 in nanoseconds should be reported.
 
-\item
-Experimentation with different hash functions. A simple function such as f (r) = r\%hsize should be the
-initial attempt.
+\section{Experimentation with different hash functions}
+\subsection{Simple Hash}
+\begin{lstlisting}[language=C++]
+static int hash(const std::string& word, int size) {
+    long int hashValue = 0;
 
-Our first attempt: (based on Rabin-Karp hash)
+    for (char c : word) {
+        hashValue += c;
+    }
+
+    return hashValue % size;
+}
+\end{lstlisting}
+
+\begin{center}
+Results\\
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Hash Type & Time(ms) & Lambda & \multicolumn{3}{|c|}{Chain Length/ Cluster Size} \\
+ & & & Max & Min & Mean (non-zero) \\
+\hline
+Open & 31 & 0.705688 & 33 & 0 & 5.74652\\
+Linear & 283 & 0.340332 & 5481 & 1 & 242.435\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Rabin-Karp Hash}
+
+\begin{lstlisting}[language=C++]
 static int hash(const std::string& word, int size) {
     int n = 0; // Hash value
-    int h = 1;
-    int d = 256; // d is the number of characters in the input alphabet 
-    // The value of h would be "pow(d, M-1)%q"
-    for (int i = 0; i < (int)word.size() - 1; i++)
-        h = (h * d) % size;
-
+    int d = 256; // number of characters in the input alphabet 
     for (int i = 0; i < (int)word.size(); i++)
         n = (d * n + word[i]) % size;
 
     return abs(n);
 }
+\end{lstlisting}
 
-Yield:
-Open Chaining:
-Number of lists: 8192
-Number of words stored: 5781
-Load Size (Lambda): 0.705688
-Maximum Chain Length: 740
-Minimum Chain Length: 0
+\begin{center}
+Results\\
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Hash Type & Time(ms) & Lambda & \multicolumn{3}{|c|}{Chain Length/ Cluster Size} \\
+ & & & Max & Min & Mean (non-zero) \\
+\hline
+Open & 40 & 0.705688 & 740 & 0 & 20.573\\
+Linear & 80 & 0.340332 & 4879 & 1 & 242.435\\
+\hline
+\end{tabular}
+\end{center}
 
-Linear Probing:
-Size of hashtable: 16384
-Number of words stored: 5576
-Load size (lambda): 0.340332
-Largest cluster: 4879
-Smallest cluster: 1
-Average cluster: 253.455
+\subsection{Polynomial Rolling Hash}
 
 Our second attempt: (Polynomial Rolling Hash from Geeks4Geeks)
+\begin{lstlisting}[language=C++]
 static int hash(const std::string& word, int size) {
     int p = 31, m = 1e9 + 7, hashValue = 0, pPow = 1;
 
@@ -85,24 +104,25 @@ static int hash(const std::string& word, int size) {
 
     return abs(hashValue % size);
 }
+\end{lstlisting}
 
-yield:
-Open Chaining:
-Number of lists: 8192
-Number of words stored: 5781
-Load Size (Lambda): 0.705688
-Maximum Chain Length: 6
-Minimum Chain Length: 0
+\begin{center}
+Results\\
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Hash Type & Time(ms) & Lambda & \multicolumn{3}{|c|}{Chain Length/ Cluster Size} \\
+ & & & Max & Min & Mean (non-zero) \\
+\hline
+Open & 46 & 0.705688 & 6 & 0 & 1.40044\\
+Linear & 24 & 0.340332 & 32 & 1 & 1.79491\\
+\hline
+\end{tabular}
+\end{center}
 
-Linear Probing:
-Size of hashtable: 16384
-Number of words stored: 5576
-Load size (lambda): 0.340332
-Largest cluster: 32
-Smallest cluster: 1
-Average cluster: 1.79491
+\subsection{Polynomial Rolling Hash With Reduced Alphabet}
 
 third attempt: (maps only the characters we allow)
+\begin{lstlisting}[language=C++]
 static int charToIndex(const char c) {
     //-, a, b, ..., z, 0, 1, ... 9
     if (c == '-') return 1;
@@ -123,41 +143,48 @@ static int hash(const std::string& word, int size) {
 
     return hashValue % size;
 }
+\end{lstlisting}
 
-yield:
-Open Chaining:
-Number of lists: 8192
-Number of words stored: 5781
-Load Size (Lambda): 0.705688
-Maximum Chain Length: 5
-Minimum Chain Length: 0
+\begin{center}
+Results\\
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Hash Type & Time(ms) & Lambda & \multicolumn{3}{|c|}{Chain Length/ Cluster Size} \\
+ & & & Max & Min & Mean (non-zero) \\
+\hline
+Open & 26 & 0.705688 & 5 & 0 & 1.389\\
+Linear & 21 & 0.340332 & 14 & 1 & 1.80804\\
+\hline
+\end{tabular}
+\end{center}
 
-Linear Probing:
-Size of hashtable: 16384
-Number of words stored: 5576
-Load size (lambda): 0.340332
-Largest cluster: 21
-Smallest cluster: 1
-Average cluster: 1.80804
-
-
-
-\item
+\section{Handling collisions in the table for linear probing}
 Handling collisions in the table for linear probing. The collision resolution method implemented must be
 described, with research and inclusion of a method described in the lecture.
 
-\item
-The necessity of an interface file (a “.h” file) for the functions implemented.
+\subsection{Linear}
+\begin{lstlisting}[language=C++]
+int index = hash(pair.word, size);
+while (!arr[index].empty && arr[index].word != pair.word) {
+    index = (index + 1) % size;
+}
+\end{lstlisting}
 
-\item
+\subsection{Double Hash}
+\begin{lstlisting}[language=C++]
+int index = hash(pair.word, size);
+while (!arr[index].empty && arr[index].word != pair.word) {
+    index = (index + hash(index, size)) % size;
+}
+\end{lstlisting}
+
+\section{Rabin-Karp}
 Writing a function to prompt a user for a word, display the number of occurrences of this word in the
 text, and the locations of said occurrences in “The Adventure of the Engineer’s Thumb”.
 
-\item
+\section{80 Least and most frequent words}
 Implementing a function to output a list of the 80 least frequently occurring words in the text.
 
-\item
 Implementing a function to output a list of the 80 most frequently occurring words in the text.
-\end{enumerate}
 
 \end{document}
