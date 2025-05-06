@@ -37,7 +37,7 @@ std::chrono::nanoseconds OpenHashing::getTotalNanoseconds() {
 
 // Insert a word (or increment if already exists) in hash table
 void OpenHashing::insert(const std::string& raw_word) {
-    if (10*occupancy/size > 9)
+    if (10*occupancy/size >= 9)
         resize(); //Y. Daniel Yiang recommends a lambda under 0.9 for separate chaining
 
     std::string word = raw_word;
