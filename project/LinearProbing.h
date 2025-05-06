@@ -14,8 +14,8 @@ public:
     ~LinearProbing();
 
     void read(std::istream& in);
-    void readUntil(std::istream& in, std::string end);
     void read(std::vector<WordPair>& in);
+    void readUntil(std::istream& in, std::string end);
     std::chrono::nanoseconds getTotalNanoseconds();
     void output(std::ostream& out);  
     void printStats(std::ostream& out);
