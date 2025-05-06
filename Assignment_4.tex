@@ -5,12 +5,6 @@
 \usepackage{listings}
 \usepackage{multicol}
 \bibliographystyle{apsr}
-\usepackage{algorithm}
-\usepackage{algpseudocode}
-\usepackage{amsmath}
-\usepackage{graphicx} 
-\usepackage{forest}
-\usepackage{hyperref}
 
 \begin{document}
 \title{Theory and Code Task 4}
@@ -21,9 +15,10 @@
 
 \begin{abstract}
 \begin{center}
-citations
-https://www.geeksforgeeks.org/rabin-karp-algorithm-for-pattern-searching/
-https://www.geeksforgeeks.org/string-hashing-using-polynomial-rolling-hash-function/
+citations\\
+www.geeksforgeeks.org/rabin-karp-algorithm-for-pattern-searching/
+www.geeksforgeeks.org/string-hashing-using-polynomial-rolling-hash-function/
+"Introduction to C++ Programming and Data Structures" Y. Daniel Yiang
 \end{center}
 \end{abstract}
 
@@ -47,7 +42,7 @@ static int hash(const std::string& word, int size) {
 Results\\
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
-Hash Type & Time(ms) & Lambda & \multicolumn{3}{|c|}{Chain Length/ Cluster Size} \\
+Hash Type & Time(ms) & $\lambda$ & \multicolumn{3}{|c|}{Chain Length/ Cluster Size} \\
  & & & Max & Min & Mean (non-zero) \\
 \hline
 Open & 31 & 0.705688 & 33 & 0 & 5.74652\\
@@ -75,7 +70,7 @@ static int hash(const std::string& word, int size) {
 Results\\
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
-Hash Type & Time(ms) & Lambda & \multicolumn{3}{|c|}{Chain Length/ Cluster Size} \\
+Hash Type & Time(ms) & $\lambda$ & \multicolumn{3}{|c|}{Chain Length/ Cluster Size} \\
  & & & Max & Min & Mean (non-zero) \\
 \hline
 Open & 40 & 0.705688 & 740 & 0 & 20.573\\
@@ -106,7 +101,7 @@ static int hash(const std::string& word, int size) {
 Results\\
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
-Hash Type & Time(ms) & Lambda & \multicolumn{3}{|c|}{Chain Length/ Cluster Size} \\
+Hash Type & Time(ms) & $\lambda$ & \multicolumn{3}{|c|}{Chain Length/ Cluster Size} \\
  & & & Max & Min & Mean (non-zero) \\
 \hline
 Open & 46 & 0.705688 & 6 & 0 & 1.40044\\
@@ -147,7 +142,7 @@ static int hash(const std::string& word, int size) {
 Results\\
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
-Hash Type & Time(ms) & Lambda & \multicolumn{3}{|c|}{Chain Length/ Cluster Size} \\
+Hash Type & Time(ms) & $\lambda$ & \multicolumn{3}{|c|}{Chain Length/ Cluster Size} \\
  & & & Max & Min & Mean (non-zero) \\
 \hline
 Open & 26 & 0.705688 & 5 & 0 & 1.389\\
@@ -159,83 +154,63 @@ Linear & 21 & 0.340332 & 14 & 1 & 1.80804\\
 The max chain length and the runtime for linear probing are marginally improved but the runtime for open chaining is finally down. Due to continually reduced gains, this hashing method was decided to be best for our use case.
 
 \section{Experimenting with occupancy ratios in linear probing}
-\subsection{$\lambda < 0.5$}
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|c|}
-\hline
-Cutoff & Time(ns) & Lambda & \multicolumn{3}{|c|}{Cluster Size} \\
- & & & Max & Min & Mean (non-zero) \\
-\hline
-0.5 & 22713966 & 0.340332 & 14 & 1 & 1.8022 \\
-\hline
-\end{tabular}
-\end{center}
 
-\subsection{$\lambda < 0.9$}
 \begin{center}
-\begin{tabular}{|c|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|}
 \hline
-Cutoff & Time(ns) & Lambda & \multicolumn{3}{|c|}{Cluster Size} \\
- & & & Max & Min & Mean (non-zero) \\
+Exp. \# & Cutoff & Time(ns) & $\lambda$ \\
 \hline
-0.5 & 25118597 & 0.680664 & 14 & 1 & 1.8022 \\
+1. & 0.5 & 22045420 & 0.340332 \\
+2. & ... & 22854454 & ... \\
+3. & ... & 27654239 & ... \\
+Mean & 0.5 & 24184704 & 0.340332 \\
+\hline
+1. & 0.9 & 21338314 & 0.754639 \\
+2. & ... & 22113859 & ... \\
+3. & ... & 22115551 & ... \\
+Mean & 0.9 & 21855908 & 0.754639 \\
+\hline
+1. & 0.75 & 22713966 & 0.680664 \\
+2. & ... & 20728820 & ... \\
+3. & ... & 21238333 & ... \\
+Mean & 0.75 & 21560373 & 0.680664 \\
 \hline
 \end{tabular}
 \end{center}
-
-\subsection{$\lambda < 0.75$}
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|c|}
-\hline
-Cutoff & Time(ns) & Lambda & \multicolumn{3}{|c|}{Cluster Size} \\
- & & & Max & Min & Mean (non-zero) \\
-\hline
-0.5 & 20272493 & 0.680664 & 14 & 1 & 1.8022 \\
-\hline
-\end{tabular}
-\end{center}
-On average, keeping lambda under 0.75 provided the best run times for linear probing.
+Although runtimes did improve, the results could likely be attributed to random error.
 
 \section {Optimizing chain length in open hashing}
 
-\subsection{$\lambda < 1$}
 \begin{center}
-\begin{tabular}{|c|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|c|c|}
 \hline
-Cutoff & Time(ns) & Lambda & \multicolumn{3}{|c|}{Chain Length} \\
- & & & Max & Min & Mean (non-zero) \\
+Exp. \# & Cutoff & Time(ns) & $\lambda$ & \multicolumn{2}{|c|}{Chain Length} \\
+ & & & & Max & Mean (non-zero) \\
 \hline
-1 & 43936770 & 0.705688 & 5 & 0 & 1.389 \\
+1. & 1.0 & 28200083 & 0.705688 & 5 & 1.389\\
+2. & ... & 28867946 & ... & \multicolumn{2}{c|}{...} \\
+3. & ... & 27633391 & ... & \multicolumn{2}{c|}{...} \\
+Mean & 1.0 & 28233807 & 0.705688 & 5 & 1.389\\
+\hline
+1. & 0.9 & 25575107 & 0.705688 & 5 & 1.389 \\
+2. & ... & 26536237 & ... & \multicolumn{2}{c|}{...} \\
+3. & ... & 25898983 & ... & \multicolumn{2}{c|}{...} \\
+Mean & 0.9 & 26003442 & 0.705688 & 5 & 1.389 \\
+\hline
+1. & 0.5 & 29691677 & 0.352844 & 4 & 1.18755\\
+2. & ... & 27364069 & ... & \multicolumn{2}{c|}{...} \\
+3. & ... & 27763650 & ... & \multicolumn{2}{c|}{...} \\
+Mean & 0.5 & 28273132 & 0.352844 & 4 & 1.18755\\
+\hline
+1. & 0.25 & 41166534 & 0.176422 & 3 & 1.08952\\
+2. & ... & 30426945 & ... & \multicolumn{2}{c|}{...} \\
+3. & ... & 32216903 & ... & \multicolumn{2}{c|}{...} \\
+Mean & 0.25 & 34603460 & 0.176422 & 3 & 1.08952\\
 \hline
 \end{tabular}
 \end{center}
 
-\subsection{$\lambda < 0.5$}
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|c|}
-\hline
-Cutoff & Time(ms) & Lambda & \multicolumn{3}{|c|}{Chain Length} \\
- & & & Max & Min & Mean (non-zero) \\
-\hline
-0.5 & 28392585 & 0.352844 & 4 & 0 & 1.18755 \\
-\hline
-\end{tabular}
-\end{center}
-
-\subsection{$\lambda < 0.9$}
-Y. Daniel Yiang recommends a lambda under 0.9 for separate chaining
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|c|}
-\hline
-Cutoff & Time(ms) & Lambda & \multicolumn{3}{|c|}{Chain Length} \\
- & & & Max & Min & Mean (non-zero) \\
-\hline
-0.9 & 24714102 & 0.705688 & 5 & 0 & 1.389 \\
-\hline
-\end{tabular}
-\end{center}
-
-Keeping lambda under 0.9 provided the best run times in separate chaining.
+Keeping lambda under 0.9 provided the best runtimes in separate chaining. Notably, Y. Daniel Yiang in "Introduction to C++ Programming and Data Structures" recommends a cutoff of 0.9. But to optimize chain length against time, a cutoff of 0.5 works best.
 
 \section{Handling collisions in the table for linear probing}
 Handling collisions in the table for linear probing. The collision resolution method implemented must be
@@ -261,7 +236,7 @@ for (int i = 1; !arr[index].empty && arr[index].word != pair.word; i++) {
 Results\\
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
-Probe type & Time(ms) & Lambda & \multicolumn{3}{|c|}{Cluster Size} \\
+Probe type & Time(ms) & $\lambda$ & \multicolumn{3}{|c|}{Cluster Size} \\
  & & & Max & Min & Mean (non-zero) \\
 \hline
 Linear & 21 & 0.340332 & 14 & 1 & 1.80804\\
@@ -271,9 +246,6 @@ Quadratic & 32 & 0.340332 & 13 & 1 & 1.77799\\
 \end{center}
 
 Despite marginal improvements in custer size, the quadratic probing adds considerable runtime to our program. It was decided we would stick with linear probing.
-
-\section{Rabin-Karp}
-Writing a function to prompt a user for a word, display the number of occurrences of this word in the text, and the locations of said occurrences in “The Adventure of the Engineer’s Thumb”.
 
 \section{80 Least and most frequent words}
 
