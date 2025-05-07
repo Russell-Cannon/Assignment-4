@@ -6,19 +6,6 @@
 #include "Functions.h"
 #include "WordPair.h"
 
-struct Pattern {
-    std::string raw;              
-    std::string pat;              
-    int M;                         
-    int d = 256;
-    int q = 2147483647;
-    long p_hash = 0;              
-    long h = 1; 
-    long w_hash = 0;                  
-    std::deque<char> window;      
-    std::vector<int> occurrences; 
-};
-
 class LinearProbing {
 public:
     LinearProbing();
@@ -37,8 +24,7 @@ public:
     void addElement(WordPair pair);
     void addInsertionTime(std::chrono::nanoseconds ns);
 
-    
-    private:
+private:
     int size = 64, occupancy = 0;
     WordPair* arr = nullptr;
     std::chrono::nanoseconds total_nanoseconds;

@@ -135,13 +135,14 @@ std::vector<WordPair> LinearProbing::getLeastFrequent(int K) {
 }
 
 void LinearProbing::addElement(WordPair pair) {
-    if (4*occupancy/size >= 3)
+    if (2*occupancy/size >= 1)
         resize();
 
     int index = hash(pair.word, size);
     for (int i = 1; !arr[index].empty && arr[index].word != pair.word; i++) {
         index = (index + i*i) % size;
     }
+    
     if (arr[index].empty) { //Does not already exist
         arr[index].word = pair.word;
         arr[index].empty = false;

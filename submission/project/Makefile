@@ -30,4 +30,4 @@ clean:
 # FIXME
 # Add a rule to run the program
 run:
-	./$(PROGRAM)
+	./$(PROGRAM) 'A Scandal In Bohemia.txt' stats.log

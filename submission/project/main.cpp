@@ -7,17 +7,35 @@
 #include <vector>
 #include <chrono>
 #include <string>
+#include <cstring>
 #include "Rabin.h"
 
 std::vector<std::string> getUserSearchKeys();
 void searchKeys(std::ifstream& in, LinearProbing& linear, std::string end);
 
-int main() {
+int main(int argc, char *argv[]) {
+    //Open input file
+    char *inFileName, *outFileName;
+    inFileName = new char[32];
+    outFileName = new char[32];
+    if (argc < 2) { //If the user forgot to provide an input filename and output filename
+        std::cout << "Enter name of input file: ";
+        std::cin >> inFileName;
+        std::cout << "Enter name of output file: ";
+        std::cin >> outFileName;
+    } else if (argc == 2) { //Input but no output
+        strcpy(inFileName, argv[1]); //Copy terminal argument to the filename
+        std::cout << "Enter name of output file: ";
+        std::cin >> outFileName;
+    } else if (argc >= 3) { //Both
+        strcpy(inFileName, argv[1]);
+        strcpy(outFileName, argv[2]);
+    }
     std::chrono::nanoseconds total_time = std::chrono::nanoseconds(0);
-    std::ifstream in("A Scandal In Bohemia.txt");
+    std::ifstream in(inFileName);
 
     if (!in.is_open()) {
-        std::cerr << "Failed to open input file.\n";
+        std::cerr << "Failed to open input file '" << inFileName << "'.\n";
         return 1;
     }
 
@@ -56,37 +74,37 @@ int main() {
     
     // Once the data is processed, the program should display and record to a file a list of word occurrences from highest to lowest vice versa of the 80 most and least repeated words (and their count)
     const int N = 80;
-    std::vector<WordPair> highest = combineVectors(linear.getMostFrequent(N), open.getMostFrequent(N));
-    std::vector<WordPair> lowest = combineVectors(linear.getLeastFrequent(N), open.getLeastFrequent(N));
+    std::vector<WordPair> highest = combineVectors(linear.getMostFrequent(2*N), open.getMostFrequent(2*N));
+    std::vector<WordPair> lowest = combineVectors(linear.getLeastFrequent(2*N), open.getLeastFrequent(2*N));
     
-    std::ofstream mostOut("frequent.log");
-    std::ofstream leastOut("rare.log");
+    std::ofstream output(outFileName);
 
     //Create another hash table to combine the two
     LinearProbing highestCombined(highest);
     highest = highestCombined.getMostFrequent(N);
-    for (int i = 0; i < N; i++) mostOut << (i+1) << ". " << highest[i] << '\n';
-
+    
     LinearProbing lowestCombined(lowest);
     lowest = lowestCombined.getLeastFrequent(N);
-    for (int i = 0; i < N; i++) leastOut << (i+1) << ". " << lowest[i] << '\n';
-
-    std::ofstream stats("stats.log");
-    stats << "Total sentences: " << sentence_counter << '\n';
-    stats << "Most common word: '" << highest[0].word << "'\n";
-    stats << "Least common word: '" << lowest[0].word << "'\n";
+    
+    output << "Total sentences: " << sentence_counter << '\n';
+    output << "Most common word: '" << highest[0].word << "'\n";
+    output << "Least common word: '" << lowest[0].word << "'\n";
     // can use getters from classes to get the total runtime
     total_time += open.getTotalNanoseconds() + linear.getTotalNanoseconds();
-    stats << "Total time for open and linear: " << total_time.count() << '\n';
+    output << "Total time for open and linear: " << total_time.count() << '\n';
+    
+    output << "\nOpen Chaining:\n";
+    open.printChainStats(output);
+    output << "\nLinear Probing:\n";
+    linear.printStats(output);
 
-    stats << "\nOpen Chaining:\n";
-    open.printChainStats(stats);
-    stats << "\nLinear Probing:\n";
-    linear.printStats(stats);
+    output << '\n' << N << " most frequent words:\n";
+    for (int i = 0; i < N; i++) output << (i+1) << ". " << highest[i] << '\n';
 
-    stats.close();
-    mostOut.close();
-    leastOut.close();
+    output << '\n' << N << " least frequent words:\n";
+    for (int i = 0; i < N; i++) output << (i+1) << ". " << lowest[i] << '\n';
+
+    output.close();
 
     return 0;
 }
