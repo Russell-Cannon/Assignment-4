@@ -29,19 +29,20 @@ void Search(const std::string& pat, const std::string& txt, int q)
     for (int i = 0; i < N; ++i) {
     charToWordCount[i] = wordCount;
     if (txt[i] == ' ') {
-    ++wordCount;
-    }
+            ++wordCount;
+        }
     }
 
     // The value of h would be "pow(d, M-1)%q"
     for (int i = 0; i < M - 1; i++) {
-    h = (h * d) % q;
+        h = (h * d) % q;
     }
 
     /* Calculate hash values of pattern and first window of text */
     for (int i = 0; i < M; ++i) {
-    patHash = (d * patHash + pat[i]) % q;
-    txtHash = (d * txtHash + txt[i]) % q;
+        //Horner’s rule for the rolling hash should be utilized for this purpose
+        patHash = (d * patHash + pat[i]) % q;
+        txtHash = (d * txtHash + txt[i]) % q;
     }
 
      /* Slide the pattern over text one by one */

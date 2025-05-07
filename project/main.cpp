@@ -32,6 +32,7 @@ int main() {
 
     std::cout << "Would you like to find words in 'The Adventure of the Engineer’s Thumb'?" << std::endl;
     std::cout << "0: no, end program..." << std::endl << "1: yes, pattern match..." << std::endl;
+    std::cin >> user;
     if (user == 0)
     {
         std::cout << "skipping program...";

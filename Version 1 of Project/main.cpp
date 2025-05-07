@@ -7,7 +7,6 @@
 #include <vector>
 #include <chrono>
 #include <string>
-
 #include "Rabin.h"
 
 std::vector<std::string> getUserSearchKeys();
@@ -22,6 +21,24 @@ int main() {
         return 1;
     }
 
+    std::cout << "Welcome!\nPlease make a choice:\n0. Quit Program.\n1. Find search keys in Chapter IX and count words.\n2. Just count words in text.\nChoice: ";
+    int choice = -1;
+    bool findKeys = true;
+    std::cin >> choice;
+    switch (choice) {
+        case 0:
+            std::cout << "Thank you!\nShutting down...\n";
+            return 0;
+        case 1:
+            break;
+        case 2:
+            findKeys = false;
+            break;
+        default:
+            std::cout << "Invalid choice!\nShutting down...\n";
+            return 1;
+    }
+
     // Works I through VI should be stored using open hashing (separate chaining)
     OpenHashing open;
     open.readUntil(in, "VII");
@@ -30,11 +47,10 @@ int main() {
     LinearProbing linear;
     linear.readUntil(in, "IX"); //read up until we hit Chapter 9.
 
-
     //As the program starts processing work IX “The Adventure of the Engineer’s Thumb”, it should prompt the user for search key
     //display the position of each key’s occurrence in the text
-    //Rabin-Karp pattern matching algorithm and Horner’s rule for the rolling hash should be utilized for this purpose
-    searchKeys(in, linear, "X"); // also stores chapter IX in linear probing
+    if (findKeys)
+        searchKeys(in, linear, "X"); // also stores chapter IX in linear probing
 
     linear.read(in); //read until end
     
@@ -59,15 +75,14 @@ int main() {
     stats << "Total sentences: " << sentence_counter << '\n';
     stats << "Most common word: '" << highest[0].word << "'\n";
     stats << "Least common word: '" << lowest[0].word << "'\n";
+    // can use getters from classes to get the total runtime
+    total_time += open.getTotalNanoseconds() + linear.getTotalNanoseconds();
+    stats << "Total time for open and linear: " << total_time.count() << '\n';
 
     stats << "\nOpen Chaining:\n";
     open.printChainStats(stats);
     stats << "\nLinear Probing:\n";
     linear.printStats(stats);
-
-    // can use getters from classes to get the total runtime
-    total_time += open.getTotalNanoseconds() + linear.getTotalNanoseconds();
-    std::cout << "Total time for open and linear: " << total_time.count() << '\n';
 
     stats.close();
     mostOut.close();
