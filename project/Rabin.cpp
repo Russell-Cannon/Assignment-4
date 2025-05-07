@@ -62,7 +62,7 @@ void Search(const std::string& pat, const std::string& txt, int q)
         positions.push_back(charToWordCount[i]);
     }
     }
-    // slide the hash forawrd
+    // slide the hash forward
     if (i < N - M) {
         txtHash = (d * (txtHash - txt[i] * h) + txt[i + M]) % q;
         if (txtHash < 0){ 
