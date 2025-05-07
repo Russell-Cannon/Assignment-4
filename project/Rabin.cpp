@@ -1,119 +1,115 @@
 #include "Rabin.h"
 
-int Rabin(string txt, string pat, int row)
+void Rabin(const std::string& txt, std::string pat)
 {
-    int q = 0b1111111111111111111111111111111;
-    int word_count;
-
-    clean(txt);
-    clean(pat);
-
-    word_count = search(pat, txt, q);
+    const int q = 0b1111111111111111111111111111111;
+    clean(pat); // clean user keys/patters
     
-    if(word_count > 0 )
-    {
-        cout << "Pattern found on row: "<< row << endl;
-    }
-    cout << "There are a total of " << word_count << " in the txt that match" << endl;
-    return 0;
+    // search for user keys. txt is already cleaned from building string
+    Search(pat, txt, q);
 
 }
 
-int search(string pat, string txt, int q)
+void Search(const std::string& pat, const std::string& txt, int q)
 {
     int M = pat.size();
     int N = txt.size();
-    int i, j;
-    int pattern = 0; // hash value for pattern
-    int text = 0; // hash value for txt
+    int patHash = 0;
+    int txtHash = 0;
+    int d = 256;
     int h = 1;
-    int d = 256; // d is the number of characters in the input ASCII alphabet
-    int amount = 0;
+    if (M == 0 || N < M) {
+        std::cout << "Pattern: \"" << pat << "\"\n" << "No possible matches (empty or longer than text).\n" << "===================================\n\n";
+        return; 
+      }
 
-    /* start the clock for run time of both Rabin Carp and Las Vegas check */
-    auto tot_start = std::chrono::high_resolution_clock::now();
+    // build word count mapping for each character
+    std::vector<int> charToWordCount(N);
+    int wordCount = 1;
+    for (int i = 0; i < N; ++i) {
+    charToWordCount[i] = wordCount;
+    if (txt[i] == ' ') {
+            ++wordCount;
+        }
+    }
 
     // The value of h would be "pow(d, M-1)%q"
-    for (i = 0; i < M - 1; i++)
-    {
+    for (int i = 0; i < M - 1; i++) {
         h = (h * d) % q;
     }
 
     /* Calculate hash values of pattern and first window of text */
-    for (i = 0; i < M; i++)
-    {
-        pat = (d * pattern + pat[i]) % q;
-        text = (d * text + txt[i]) % q;
+    for (int i = 0; i < M; ++i) {
+        //Horner’s rule for the rolling hash should be utilized for this purpose
+        patHash = (d * patHash + pat[i]) % q;
+        txtHash = (d * txtHash + txt[i]) % q;
     }
 
-    /* Slide the pattern over text one by one */
-    for (i = 0; i <= N - M; i++)
-    {
-        if (pattern == text)
-        {
-            /* Check for characters one by one */
-            for (j = 0; j < M; j++)
-            {
-                if (txt[i + j] != pat[j])
-                {
-                    cerr << "ERR: pattern broken" << endl;
-                    break;
-                }
-            }
-
-            if (j == M)
-            {
-                if (Las_vegas(pat, txt, i) == true)
-                {
-                    amount++;
-                    auto tot_stop = std::chrono::high_resolution_clock::now();
-                    auto tot_time = std::chrono::duration_cast<std::chrono::nanoseconds>(tot_stop - tot_start);
-                    cout << "------------------------------------" << endl;
-                    cout << "Word found " << Wordplace(i, txt) << " words into the sentence" << endl;
-                    printf("\n");
-
-                    cout << "\"" << txt << "\" " << endl;
-                    for(int o = 0;  o < i+1; o++)
-                    {
-                        cout << " ";
-                    }
-                    for(size_t v = 0; v < pat.size(); v++)
-                    {
-                        cout << "^";
-                    }
-                    printf("\n");
-                    std::cout << "Rabin Carp time taken: " << tot_time.count() << " nanoseconds!" << std::endl;      
-                }
-                else
-                {
-                    auto tot_stop = std::chrono::high_resolution_clock::now();
-                    auto tot_time = std::chrono::duration_cast<std::chrono::nanoseconds>(tot_stop - tot_start);
-                    cout << "Pattern denied by Las Vegas check" << endl;
-                    std::cout << "Rabin Carp time: " << tot_time.count() << " nanoseconds!" << std::endl;
-                }
-            }
-        }
-        if (i < N - M)
-        {
-            text = (d * (text - txt[i] * h) + txt[i + M]) % q;
-            if (text < 0)
-            {
-                text = (text + q);
-            }
+     /* Slide the pattern over text one by one */
+    std::vector<int> positions;
+    auto time_start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i <= N - M; ++i) {
+    if (patHash == txtHash) {
+    bool match = true;
+    for (int j = 0; j < M; ++j) {
+        if (txt[i + j] != pat[j]) {
+            match = false;
+            break;
         }
     }
-    if(amount == 0)
-    {
-        cout << "No patterns found" << endl;
-        auto tot_stop = std::chrono::high_resolution_clock::now();
-        auto tot_time = std::chrono::duration_cast<std::chrono::nanoseconds>(tot_stop - tot_start);
-        std::cout << "Time elapsed: " << tot_time.count() << " nanoseconds!" << std::endl;
+    // if hashes match, then do a las vegas check
+    if (match && Las_vegas(pat, txt, i)) {
+        positions.push_back(charToWordCount[i]);
     }
-    cout << "------------------------------------" << endl;
-    return amount;
+    }
+    // slide the hash forawrd
+    if (i < N - M) {
+        txtHash = (d * (txtHash - txt[i] * h) + txt[i + M]) % q;
+        if (txtHash < 0){ 
+            txtHash += q;
+        }
+    }
+    }
+    auto time_end = std::chrono::high_resolution_clock::now();
+    auto time_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
+
+    // print summary of search
+    std::cout << "===========================================================\n";
+    std::cout << "Pattern            : " << pat << "\n";
+    std::cout << "Pattern length     : " << M << "\n";
+    std::cout << "Total matches      : " << positions.size() << "\n";
+    std::cout << "Word position in ch: ";
+
+    if (positions.empty()) {
+        std::cout << "no matches\n";
+    
+    } 
+    // less than or equal to 20 matches, list all positions
+    else if (positions.size() <= 20) {
+        for (size_t k = 0; k < positions.size(); ++k) {
+            std::cout << positions[k]
+            << (k + 1 < positions.size() ? ", " : "\n");
+        }
+    } 
+    // display first 10 & last 10
+    else {
+        // first 10
+        for (size_t k = 0; k < 10; ++k) {
+            std::cout << positions[k] << ", ";
+        }
+        std::cout << "…, ";
+        // last 10
+        for (size_t k = positions.size() - 10; k < positions.size(); ++k) {
+            std::cout << positions[k]
+            << (k + 1 < positions.size() ? ", " : "\n");
+        }
+    }
+    std::cout << "Chapter length     : " << wordCount << " words\n";
+    std::cout << "Elapsed time       : " << time_duration << " nanoseconds\n";
+    std::cout << "=========================================================\n\n";
 }
 
-bool Las_vegas(string pat, string txt, int i)
+bool Las_vegas(std::string pat, std::string txt, int i)
 {
     bool veg;
     for(size_t j = 0; j < pat.size(); j++)
@@ -128,17 +124,4 @@ bool Las_vegas(string pat, string txt, int i)
         return true;
     }
     return false;
-}
-
-int Wordplace(int index, string txt)
-{
-    int spacecount = 1; // to account for the 0th word
-    for(int i = 0; i < index; i++)
-    {
-        if(txt[i] == ' ')
-        {
-            spacecount++;
-        }
-    }
-    return spacecount;
 }

@@ -33,17 +33,21 @@ void LinearProbing::read(std::istream& in) {
 void LinearProbing::readUntil(std::istream& in, std::string end) {
     clean(end);
     std::string word;
+    std::vector<std::string> words;
     while (in >> word) {
         auto time_start = std::chrono::high_resolution_clock::now();
-        for (std::string w : clean_and_split(word)) { //Usually just one, sometimes two
+        words = clean_and_split(word); //Usually just one, sometimes two
+        for (std::string w : words) { 
             if (w == end)
                 return;
-
+                
             addElement(WordPair(w, 1));
         }
         auto time_stop = std::chrono::high_resolution_clock::now();
         auto time_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(time_stop - time_start);
         total_nanoseconds += time_duration;
+
+        words.clear();
     }
 }
 
@@ -113,6 +117,7 @@ std::vector<WordPair> LinearProbing::getMostFrequent(int K) {
     }
     return output;
 }
+
 std::vector<WordPair> LinearProbing::getLeastFrequent(int K) {
     std::priority_queue<WordPair, std::vector<WordPair>, Less> heap;
     for (int i = 0; i < size; i++) {
@@ -165,4 +170,8 @@ void LinearProbing::resize() {
     delete [] arr;
     arr = newArr;
     size *= 2;
+}
+
+void LinearProbing::addInsertionTime(std::chrono::nanoseconds ns) {
+    total_nanoseconds += ns;
 }

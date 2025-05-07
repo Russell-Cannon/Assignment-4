@@ -2,24 +2,41 @@
 #include "LinearProbing.h"
 #include "OpenHashing.h"
 #include "WordPair.h"
-#include "Rabin.h"
 #include <fstream>
 #include <iostream>
 #include <vector>
 #include <chrono>
 #include <string>
+#include "Rabin.h"
+
+std::vector<std::string> getUserSearchKeys();
+void searchKeys(std::ifstream& in, LinearProbing& linear, std::string end);
 
 int main() {
+    std::chrono::nanoseconds total_time = std::chrono::nanoseconds(0);
     std::ifstream in("A Scandal In Bohemia.txt");
-    int user;
-    std::string text;
-    std::string temptext;
-    int row;
-    std::string key[10000] = {}; //I think this is causing errors to prevent run from working
 
     if (!in.is_open()) {
         std::cerr << "Failed to open input file.\n";
         return 1;
+    }
+
+    std::cout << "Welcome!\nPlease make a choice:\n0. Quit Program.\n1. Find search keys in Chapter IX and count words.\n2. Just count words in text.\nChoice: ";
+    int choice = -1;
+    bool findKeys = true;
+    std::cin >> choice;
+    switch (choice) {
+        case 0:
+            std::cout << "Thank you!\nShutting down...\n";
+            return 0;
+        case 1:
+            break;
+        case 2:
+            findKeys = false;
+            break;
+        default:
+            std::cout << "Invalid choice!\nShutting down...\n";
+            return 1;
     }
 
     // Works I through VI should be stored using open hashing (separate chaining)
@@ -30,49 +47,10 @@ int main() {
     LinearProbing linear;
     linear.readUntil(in, "IX"); //read up until we hit Chapter 9.
 
-    std::cout << "Would you like to find words in 'The Adventure of the Engineer’s Thumb'?" << std::endl;
-    std::cout << "0: no, end program..." << std::endl << "1: yes, pattern match..." << std::endl;
-    std::cin >> user;
-    if (user == 0)
-    {
-        std::cout << "skipping program...";
-        return 0;
-    }
-    else if (user == 1)
-    {
-        std::cout << "up to 8 searches per run, use '@@@' to state the end of your string if under 8 words to search.";
-        std::cout << "Please state all your keys you want to search for: ";
-        for(int i = 0; i < sizeof(key); i++)
-        {
-            std::string tempkey;
-            std::cin >> tempkey;
-            key[i] = tempkey;
-        }
-        for (int i = 0; i <= sizeof(key); i++)
-        {
-            std::getline(std::cin, key[i], ' ');
-            if(key[i] == "@@@")
-            {
-                std::cerr << "Break out character detected, exiting" << std::endl;
-                break;
-            }
-
-            //while(in != "X. THE ADVENTURE OF THE NOBLE BACHELOR") essentially, if we see "X. THE ADVENTURE OF THE NOBLE BACHELOR", stop reading
-            //{
-                while(std::getline(in, text))
-                {
-                    text += temptext + "\n";
-                    Rabin(text, key[i], row); //obtain which row you are on and pass that into rabin, 
-                }
-            //}
-        }
-    }
-
-
-
     //As the program starts processing work IX “The Adventure of the Engineer’s Thumb”, it should prompt the user for search key
     //display the position of each key’s occurrence in the text
-    //Rabin-Karp pattern matching algorithm and Horner’s rule for the rolling hash should be utilized for this purpose
+    if (findKeys)
+        searchKeys(in, linear, "X"); // also stores chapter IX in linear probing
 
     linear.read(in); //read until end
     
@@ -97,15 +75,14 @@ int main() {
     stats << "Total sentences: " << sentence_counter << '\n';
     stats << "Most common word: '" << highest[0].word << "'\n";
     stats << "Least common word: '" << lowest[0].word << "'\n";
+    // can use getters from classes to get the total runtime
+    total_time += open.getTotalNanoseconds() + linear.getTotalNanoseconds();
+    stats << "Total time for open and linear: " << total_time.count() << '\n';
 
     stats << "\nOpen Chaining:\n";
     open.printChainStats(stats);
     stats << "\nLinear Probing:\n";
     linear.printStats(stats);
-
-    // can use getters from classes to get the total runtime
-    std::chrono::nanoseconds total_time = open.getTotalNanoseconds() + linear.getTotalNanoseconds();
-    std::cout << "Total time for open and linear: " << total_time.count() << '\n';
 
     stats.close();
     mostOut.close();
@@ -114,9 +91,63 @@ int main() {
     return 0;
 }
 
-/*
-    auto tot_start = std::chrono::high_resolution_clock::now();
-    auto tot_stop = std::chrono::high_resolution_clock::now();
-    auto tot_time = std::chrono::duration_cast<std::chrono::nanoseconds>(tot_stop - tot_start);
-    std::cout << "Final time: " << tot_time.count() << " seconds!" << std::endl;
-*/
+std::vector<std::string> getUserSearchKeys() {
+    std::vector<std::string> keys;
+    std::cout << "Enter up to 8 search keys (type @@@ to stop adding keys):\n";
+    while (keys.size() < 8) {
+        std::string input;
+        std::cin >> input;
+        if (input == "@@@") {
+            break;
+        }
+        keys.push_back(input);
+    }
+    return keys;
+}
+
+void searchKeys(std::ifstream& in, LinearProbing& linear, std::string end) {
+    clean(end);
+
+    // Get search keys from user
+    std::vector<std::string> rawKeys = getUserSearchKeys();
+
+    
+    std::string chapterIX; // store chapter into a string
+    std::string word;
+    while (in >> word) {
+        bool isEnd = false;
+        auto t0 = std::chrono::high_resolution_clock::now(); // start time
+        auto clean_word = clean_and_split(word);
+        for (auto &w : clean_word) {
+            if (w == end) { 
+                isEnd = true; 
+                break; 
+            }
+        }
+        if (isEnd) {
+            break;
+        }
+        // insert each cleaned word into the linear table
+        for (auto &w : clean_word) {
+            linear.addElement(WordPair(w, 1));
+            // build the Chapter IX string
+            chapterIX += w;
+            chapterIX += ' ';
+        }
+        auto t1 = std::chrono::high_resolution_clock::now();
+        auto time_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0);
+        linear.addInsertionTime(time_duration); // continue to calculate time of cleaning & inserting items to linear
+    }
+    
+
+    // search chapterIX with the user search keys
+    if (!rawKeys.empty()) {
+        std::cout << "\n-- Search Results in Chapter IX --\n" << std::endl;
+        for (auto key : rawKeys) {
+            Rabin(chapterIX, key);
+        }
+    } // case user just input @@@
+    else {
+        std::cout << "No keys entered; skipped Chapter IX keys search.\n";
+    }
+}
